@@ -1,0 +1,42 @@
+$main-font-color: white;
+$dir-color: #75a4ce;
+$user-color: #9ed53a;
+$background-color: rgb(48, 10, 36);
+
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono');
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    font-family: 'Ubuntu Mono';
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    background-color: $background-color;
+}
+
+.terminalInput {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    .computer {
+        color: $user-color;
+        font-weight: bold;
+    }
+    .path{
+        color: $dir-color;
+    }
+    .command {
+        color: $main-font-color;
+        margin: 0px;
+        padding: 0px;
+        border: none;
+        background-color: $background-color;
+        outline: none;
+        margin-left: 5px;        
+    }
+}

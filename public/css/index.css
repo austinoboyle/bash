@@ -1,0 +1,42 @@
+@import url("https://fonts.googleapis.com/css?family=Ubuntu+Mono");
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  font-family: 'Ubuntu Mono';
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #300a24;
+}
+
+.terminalInput {
+  display: flex;
+  flex-direction: row;
+  color: white;
+}
+
+.terminalInput .computer {
+  color: #9ed53a;
+  font-weight: bold;
+}
+
+.terminalInput .path {
+  color: #75a4ce;
+}
+
+.terminalInput .command {
+  color: white;
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  background-color: #300a24;
+  outline: none;
+  margin-left: 5px;
+}
+ 
+
+ /*# sourceMappingURL= index.css.map */
