@@ -1,4 +1,4 @@
-export function parseCommandText(text){
+function parseCommandText(text){
     text = text.trim();
     const command = text.split(/\s+/g)[0];
     const args = text.split(/\s+/g).slice(1);
@@ -27,7 +27,7 @@ export function parseCommandText(text){
     };
 }
 
-export function validateDir(dirTree, path, dirs){
+function validateDir(dirTree, path, dirs){
     console.log('VALIDATING DIRS', dirTree, path, dirs);
     
     for (let dir of ['/'].concat(path)) {
@@ -40,3 +40,5 @@ export function validateDir(dirTree, path, dirs){
     }
     return true;
 }
+
+parseCommandText('  ls  --test -ta -asd  testDir ---blablas   test/test  test2  ');

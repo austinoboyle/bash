@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import TerminalInput from '../TerminalInput';
 import Error from './Error';
 import {parseCommandText, validateDir} from '../../util';
-
+import LS from './LS';
 const KNOWN_COMMANDS = ['ls'];
 
 class OutputWrapper extends Component {
@@ -14,9 +14,13 @@ class OutputWrapper extends Component {
         } else if (!validateDir(currentDirTree, path, dirs)) {
             return <Error msg={`bash: ${command}: ${dirs.join('/')}: No such file or directory`}/>;
         }
+        let dirForCommand = currentDirTree;
+        for (let dir of ['/'].concat(path).concat(dirs)) {
+            dirForCommand = dirForCommand[dir];
+        }
         switch (command) {
             case 'ls':
-                return <LS 
+                return <LS dirForCommand={dirForCommand} />;
             default:
                 return <Error msg={`${command}: command not found`}/>;
         }

@@ -40,6 +40,21 @@ html, body {
   flex: 1;
   flex-wrap: wrap;
 }
+
+.output-ls {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.output-ls div.file {
+  margin-right: 10px;
+}
+
+.dir {
+  color: #75a4ce;
+}
  
 
  /*# sourceMappingURL= index.css.map */

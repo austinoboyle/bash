@@ -43,3 +43,19 @@ html, body {
         flex-wrap: wrap;    
     }
 }
+
+//Outputs
+
+.output-ls{
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    div.file{
+        margin-right: 10px;
+    }
+}
+
+.dir{
+    color: $dir-color;
+}
