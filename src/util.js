@@ -17,18 +17,21 @@ export function parseCommandText(text){
         // Only unique elements
         .reduce((accum, flag) => accum.includes(flag) ? accum : accum.concat([flag]), []);
 
-    const dirs = args.filter(arg => new RegExp('^[^-]+').test(arg));
+    const dirStrings = args
+        .filter(arg => new RegExp('^[^-]+').test(arg))
+        .map(arg => arg.replace(/\/$/, ""));
     console.log('TEXT:', text);
-    console.log(command, args, kwflags,flags, dirs);
+    console.log(command, args, kwflags,flags, dirStrings);
     return {
         command,
+        kwflags,
         flags,
-        dirs
+        dirStrings
     };
 }
 
-export function validateDir(dirTree, path, dirs){
-    console.log('VALIDATING DIRS', dirTree, path, dirs);
+export function validateDir(dirTree, path, dirStrings){
+    console.log('VALIDATING dirStrings', dirTree, path, dirStrings);
     
     for (let dir of ['/'].concat(path)) {
         dirTree = dirTree[dir];
@@ -39,4 +42,40 @@ export function validateDir(dirTree, path, dirs){
         }
     }
     return true;
+}
+
+
+/**
+ * 
+ * 
+ * @export
+ * @param {Object} dirTree Entire directory structure
+ * @param {Array<String>} path array of path
+ * @returns undefined if the path is invalid, String if the path leads to a file,
+ * object if the path leads to a directory.
+ */
+export function goToPath(dirTree, path){
+    let dirTreeCopy = {...dirTree};
+    const parsedPath = parsePath(path);
+
+    for (let dir of parsedPath) {
+        dirTreeCopy = dirTreeCopy[dir];
+        if (dirTreeCopy === undefined) {
+            return undefined;
+        }
+    }
+    return dirTreeCopy;
+}
+
+export function parsePath(pathArray) {
+    return pathArray.reduce((accum, dir) => {
+        switch(dir) {
+            case '.':
+                return accum;
+            case '..':
+                return accum.slice(0,accum.length - 1);
+            default:
+                return accum.concat([dir]);
+        }
+    }, []);
 }

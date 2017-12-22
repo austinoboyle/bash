@@ -3,3 +3,10 @@ export function terminalCommand() {
         type: 'COMMAND'
     };
 };
+
+export function changeDir(newDir) {
+    return {
+        type: 'CHANGE_DIR',
+        payload: newDir
+    }
+}

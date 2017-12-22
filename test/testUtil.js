@@ -42,3 +42,4 @@ function validateDir(dirTree, path, dirs){
 }
 
 parseCommandText('  ls  --test -ta -asd  testDir ---blablas   test/test  test2  ');
+parseCommandText('ls');

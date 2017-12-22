@@ -17,43 +17,60 @@ class Terminal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            text: '',
-            prevCommands: [],
-            outputs: []
+            commandHistory: [''],
+            outputs: [],
+            historyIndex: 0
         };
     }
 
     componentDidUpdate(){
-        console.log(this.state);
+        // console.log(this.state);
     }
 
     handleTimeTravel(e, direction) {
-        console.log("TODO: TIME TRAVEL");
+        let {historyIndex, commandHistory} = {...this.state};
+        switch(direction) {
+            case FORWARD:
+                historyIndex -=1;
+                break;
+            case BACKWARD:
+                historyIndex += 1;
+                break;
+        }
+        if (historyIndex >= 0 && historyIndex < commandHistory.length) {
+            this.setState({
+                historyIndex: historyIndex
+            });
+        }
+        // console.log("TODO: TIME TRAVEL");
     }
 
     handleAutoComplete(e){
         e.preventDefault(); //prevent tab from moving you around screen
-        console.log("TODO: AUTOCOMPLETE");
+        // console.log("TODO: AUTOCOMPLETE");
     }
 
     handleSubmit(e) {
-        console.log("TODO: SUBMIT");
+        // console.log("TODO: SUBMIT");
+        const submittedCommand = e.target.value;
         e.preventDefault();
-        let {text, prevCommands, outputs} = {...this.state};
+        let {text, commandHistory, historyIndex, outputs} = {...this.state};
         const {dirTree, path, user} = this.props;
-        // const {command, flags, dir} = parseCommandString(text);
-        if (this.state.text.length > 0) {
-            prevCommands.push(text);
+        if (submittedCommand.length > 0) {
+            commandHistory[0] = submittedCommand;
+            commandHistory.unshift('');
+        } else {
+            commandHistory[0] = '';
         }
         this.setState({
-            prevCommands: prevCommands,
+            commandHistory: commandHistory,
             outputs: outputs.concat([<OutputWrapper 
-                text={text}
+                text={submittedCommand}
                 currentDirTree={dirTree}
                 path={path}
                 user={user}
             />]),
-            text: ''
+            historyIndex: 0
         });
     }
 
@@ -79,16 +96,16 @@ class Terminal extends Component {
 
     handleChange(e) {
         this.setState({
-            text: e.target.value
+            commandHistory: [e.target.value].concat(this.state.commandHistory.slice(1))
         });
     }
 
     render() {
         const {path, user} = this.props;
-        const {prevCommands, outputs, text} = this.state;
+        const {commandHistory, historyIndex, outputs, text} = this.state;
         return (
             <div className = "terminal" >
-                {outputs.length > 0  && <div className="prevCommands">{outputs}</div>}
+                {outputs.length > 0  && <div className="commandHistory">{outputs}</div>}
 
                 <TerminalInput 
                     handleChange={(e) => this.handleChange(e)}
@@ -96,7 +113,7 @@ class Terminal extends Component {
                     path={this.props.path}
                     user={this.props.user}
                     isReadOnly={false}
-                    value={text}  
+                    value={commandHistory[historyIndex]}  
                 />
             </div>
         );
