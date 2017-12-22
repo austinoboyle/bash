@@ -6,6 +6,7 @@ body {
 
 html, body {
   font-family: 'Ubuntu Mono';
+  color: white;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -36,6 +37,8 @@ html, body {
   background-color: #300a24;
   outline: none;
   margin-left: 5px;
+  flex: 1;
+  flex-wrap: wrap;
 }
  
 

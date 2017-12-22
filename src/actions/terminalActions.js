@@ -1,5 +1,4 @@
-'use strict';
-export function command() {
+export function terminalCommand() {
     return {
         type: 'COMMAND'
     };
