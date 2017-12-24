@@ -41,6 +41,18 @@ html, body {
   flex-wrap: wrap;
 }
 
+textarea.output {
+  width: 100%;
+  height: auto;
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  outline: none;
+  resize: none;
+  background-color: #300a24;
+  color: white;
+}
+
 .output-ls {
   margin-bottom: 10px;
   display: flex;
@@ -55,6 +67,4 @@ html, body {
 .dir {
   color: #75a4ce;
 }
- 
-
- /*# sourceMappingURL= index.css.map */
+/*# sourceMappingURL=index.css.map */

@@ -7,6 +7,7 @@ const TerminalInput = ({path, user, isReadOnly, handleChange, handleKeyDown, val
         <div className="path">{('/' + path.join("/")).replace(TILDE_PATH, '~')}</div>
         <div className="test">$</div>
         <input
+            spellCheck={false}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             className="command"

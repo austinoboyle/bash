@@ -1,7 +1,7 @@
 import React from 'react';
 
 const PlainText = ({text}) => (
-    <div className="output">{text}</div>
+    <textarea spellCheck={false} className="output">{text}</textarea>
 );
 
 export default PlainText;

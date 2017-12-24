@@ -2,12 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Terminal from './Terminal';
 import {Provider} from 'react-redux';
-import { applyMiddleware, createStore, compose } from 'redux';
 import registerServiceWorker from './registerServiceWorker';
-
-import reducers from './reducers/index';
-
-const store = createStore(reducers);
+import store from './store';
 
 const app = (
     <Provider store={store}>

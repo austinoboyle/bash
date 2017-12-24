@@ -46,6 +46,18 @@ html, body {
 
 //Outputs
 
+textarea.output{
+    width: 100%;
+    height: auto;
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    outline: none;
+    resize: none;
+    background-color: $background-color;
+    color: $main-font-color;
+}
+
 .output-ls{
     margin-bottom: 10px;
     display: flex;

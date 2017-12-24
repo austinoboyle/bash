@@ -3,9 +3,9 @@ import logo from './logo.svg';
 import TerminalInput from './components/TerminalInput';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {terminalCommand} from './actions/terminalActions';
-import {parseCommandText} from './util';
+import getOutputsAndEffects from './middleware/getOutputsAndEffects';
 import OutputWrapper from './components/outputs/OutputWrapper';
+import {test} from './actions/terminalActions';
 
 const ENTER = 13;
 const TAB = 9;
@@ -23,11 +23,11 @@ class Terminal extends Component {
         };
     }
 
-    componentDidUpdate(){
-        // console.log(this.state);
+    componentDidMount(){
     }
 
     handleTimeTravel(e, direction) {
+        e.preventDefault();
         let {historyIndex, commandHistory} = {...this.state};
         switch(direction) {
             case FORWARD:
@@ -39,7 +39,7 @@ class Terminal extends Component {
         }
         if (historyIndex >= 0 && historyIndex < commandHistory.length) {
             this.setState({
-                historyIndex: historyIndex
+                historyIndex: historyIndex,
             });
         }
         // console.log("TODO: TIME TRAVEL");
@@ -51,31 +51,19 @@ class Terminal extends Component {
     }
 
     handleSubmit(e) {
+        e.preventDefault();
         // console.log("TODO: SUBMIT");
         const submittedCommand = e.target.value;
-        e.preventDefault();
-        let {text, commandHistory, historyIndex, outputs} = {...this.state};
-        const {dirTree, path, user} = this.props;
-        if (submittedCommand.length > 0) {
-            commandHistory[0] = submittedCommand;
-            commandHistory.unshift('');
-        } else {
-            commandHistory[0] = '';
-        }
+        const {path, dirTree, user} = {...this.props};
+        const {commandHistory, historyIndex} = {...this.state};
+        getOutputsAndEffects(submittedCommand, path, dirTree);
         this.setState({
             commandHistory: commandHistory,
-            outputs: outputs.concat([<OutputWrapper 
-                text={submittedCommand}
-                currentDirTree={dirTree}
-                path={path}
-                user={user}
-            />]),
             historyIndex: 0
         });
     }
 
     handleKeyDown(e) {
-        console.log("KEYDOWN");
         switch(e.keyCode) {
             case ENTER:
                 this.handleSubmit(e);
@@ -94,9 +82,22 @@ class Terminal extends Component {
         }
     }
 
-    handleChange(e) {
+    handleClear(){
+        let {commandHistory} = {...this.state};
+        commandHistory[0] = 'clear';
+        commandHistory.unshift('');
         this.setState({
-            commandHistory: [e.target.value].concat(this.state.commandHistory.slice(1))
+            outputs: [],
+            commandHistory,
+            historyIndex: 0
+        });
+    }
+
+    handleChange(e) {
+        let {commandHistory, historyIndex} = {...this.state};
+        commandHistory[historyIndex] = e.target.value;
+        this.setState({
+            commandHistory: commandHistory
         });
     }
 
