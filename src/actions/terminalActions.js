@@ -1,17 +1,42 @@
+import React from 'react';
 import store from '../store';
+import getOutputsAndEffects from '../middleware/getOutputsAndEffects';
+import OutputWrapper from '../components/outputs/OutputWrapper';
 
-export function test(){
-    store.dispatch({
-        type: 'CHANGE_DIR',
-        payload: ['projects']
-    });
-};
-
-export function terminalCommand() {
-    return {
-        type: 'COMMAND'
+export function submitCommand(text, path, currentDirTree, user) {
+    return function(dispatch) {
+        let allOutputs = [];
+        dispatch({
+            type: 'SUBMIT_COMMAND'
+        });
+        const listOfCommands = text.split(/&&?/);
+        for (var i = 0; i < listOfCommands.length; i++){
+            const currentState = {...store.getState().terminal};
+            const command = listOfCommands[i];
+            const {outputs, effects} = getOutputsAndEffects(command, currentState.path, currentState.dirTree);
+            for (let effect of effects) {
+                dispatch(effect);
+            }
+            allOutputs = allOutputs.concat(outputs); 
+        }
+        
+        dispatch({
+            type: 'NEW_OUTPUT',
+            payload: (
+                <OutputWrapper text={text} user={user} path={path}>
+                    {allOutputs}
+                </OutputWrapper>
+            )
+        });
+        
     };
 };
+
+export function clear(){
+    return {
+        type: 'CLEAR'
+    };
+}
 
 export function cd(newDir) {
     return {

@@ -4,7 +4,7 @@ export function parseCommandText(text){
     const args = text.split(/\s+/g).slice(1);
     const kwflags = args
         //Must contain leading double dash
-        .filter(arg => new RegExp('^-{2}').test(arg))
+        .filter(arg => new RegExp('^-{2}[^-]').test(arg))
         // Remove leading double dash
         .map(arg => arg.replace(/^--/, ""));
 
@@ -79,3 +79,10 @@ export function parsePath(pathArray) {
         }
     }, []);
 }
+
+var exports = {
+    parseCommandText,
+    goToPath,
+    parsePath,
+    validateDir
+};

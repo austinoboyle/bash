@@ -2,6 +2,7 @@ const initialState = {
     path: ['home', 'austinoboyle'],
     isActive: true,
     user: 'austinoboyle',
+    outputs: [],
     dirTree: {
         '/':{ 
             home: {
@@ -21,8 +22,10 @@ export function terminalReducer(state=initialState, action){
     let newDirTree = {...state.dirTree};
     let pointer = newDirTree;
     switch (action.type) {
-        case "COMMAND":
-            return state;
+        case "CLEAR":
+            return {...state, outputs: []};
+        case "NEW_OUTPUT":
+            return {...state, outputs: state.outputs.concat(action.payload)};
         case 'CHANGE_DIR':
             return {...state, path: action.payload};
         case 'MAKE_DIRECTORY':

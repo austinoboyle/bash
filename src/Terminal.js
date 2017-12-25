@@ -1,16 +1,18 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import TerminalInput from './components/TerminalInput';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import getOutputsAndEffects from './middleware/getOutputsAndEffects';
-import OutputWrapper from './components/outputs/OutputWrapper';
-import {test} from './actions/terminalActions';
+import {submitCommand} from './actions/terminalActions';
+import { goToPath } from './util';
 
+// Important Keys
 const ENTER = 13;
 const TAB = 9;
 const UPARROW = 38;
 const DOWNARROW = 40;
+
+// Directions
 const FORWARD = 1;
 const BACKWARD = -1;
 class Terminal extends Component {
@@ -18,7 +20,6 @@ class Terminal extends Component {
         super(props);
         this.state = {
             commandHistory: [''],
-            outputs: [],
             historyIndex: 0
         };
     }
@@ -33,9 +34,8 @@ class Terminal extends Component {
             case FORWARD:
                 historyIndex -=1;
                 break;
-            case BACKWARD:
+            default:
                 historyIndex += 1;
-                break;
         }
         if (historyIndex >= 0 && historyIndex < commandHistory.length) {
             this.setState({
@@ -47,6 +47,26 @@ class Terminal extends Component {
 
     handleAutoComplete(e){
         e.preventDefault(); //prevent tab from moving you around screen
+        const currentText = e.target.value;
+        const words = currentText.split(/\s+/);
+        const currentWord = words[words.length - 1]; //TODO make this robust
+        if (currentWord.length < 1 || words.length < 2) {
+            return;
+        }
+        const {path, dirTree} = {...this.props};
+        let {commandHistory} = {...this.state};
+        const currentDir = goToPath(dirTree, ['/'].concat(path));
+        const reString = '^' + currentWord;
+        for (let name of Object.keys(currentDir)){
+            if (name.match(new RegExp(reString))){
+                commandHistory[0] = currentText.replace(currentWord, name);
+                this.setState({
+                    commandHistory,
+                    historyIndex: 0
+                });
+                return;
+            }
+        }
         // console.log("TODO: AUTOCOMPLETE");
     }
 
@@ -55,8 +75,13 @@ class Terminal extends Component {
         // console.log("TODO: SUBMIT");
         const submittedCommand = e.target.value;
         const {path, dirTree, user} = {...this.props};
-        const {commandHistory, historyIndex} = {...this.state};
-        getOutputsAndEffects(submittedCommand, path, dirTree);
+        let {commandHistory} = {...this.state};
+        if (submittedCommand.length > 0) {
+            commandHistory.unshift('');
+        } else {
+            commandHistory[0] = '';
+        }
+        this.props.submitCommand(submittedCommand, path, dirTree, user);
         this.setState({
             commandHistory: commandHistory,
             historyIndex: 0
@@ -102,8 +127,8 @@ class Terminal extends Component {
     }
 
     render() {
-        const {path, user} = this.props;
-        const {commandHistory, historyIndex, outputs, text} = this.state;
+        const {path, user, outputs} = this.props;
+        const {commandHistory, historyIndex, text} = this.state;
         return (
             <div className = "terminal" >
                 {outputs.length > 0  && <div className="commandHistory">{outputs}</div>}
@@ -125,13 +150,14 @@ function mapStateToProps(state) {
     return {
         path: state.terminal.path,
         user: state.terminal.user,
-        dirTree: state.terminal.dirTree
+        dirTree: state.terminal.dirTree,
+        outputs: state.terminal.outputs
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-
+        submitCommand
     }, dispatch);
 }
 

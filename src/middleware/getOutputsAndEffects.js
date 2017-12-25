@@ -1,14 +1,14 @@
 import React from 'react';
 
-import {parseCommandText, validateDir, goToPath, parsePath} from '../../util';
-import {cd, mkdir, rm, touch} from '../actions/terminalActions';
+import {parseCommandText, goToPath, parsePath} from '../util';
+import {cd, mkdir, rm, touch, clear} from '../actions/terminalActions';
 import Error from '../components/outputs/Error';
 import PlainText from '../components/outputs/PlainText';
 import LS from '../components/outputs/LS';
 
-export default function getOutputsAndEffects(text, path, currentDirTree){
+export default function getOutputsAndEffects(text, path, currentDirTree, user){
     let {command, kwflags, flags, dirStrings} = parseCommandText(text);
-    
+    currentDirTree = JSON.parse(JSON.stringify(currentDirTree));
     let paths = [];
     if (dirStrings.length === 0) {
         paths = [path];
@@ -22,6 +22,12 @@ export default function getOutputsAndEffects(text, path, currentDirTree){
     let effects = [];
     console.log("PATHS", paths)
     switch (command) {
+        case '':
+            outputs.push(null);
+            break;
+        case 'clear':
+            effects.push(clear());
+            break;
         case 'ls':
             paths.forEach(path => {
                 const fullPath = ['/'].concat(path);
@@ -113,8 +119,9 @@ export default function getOutputsAndEffects(text, path, currentDirTree){
                             if (flags.includes('r')) {
                                 effects.push(rm(pathToLastElement, lastElement));
                                 outputs.push(null);
+                            }else {
+                                outputs.push(<Error msg={`rm: cannot remove '${dirStrings[index] || path.join('/')}': Is a directory`} />);                                
                             }
-                            outputs.push(<Error msg={`rm: cannot remove '${dirStrings[index] || path.join('/')}': Is a directory`} />);
                             break;
                         default:
                             outputs.push(<Error msg={`rm: cannot remove '${dirStrings[index] || path.join('/')}': No such file or directory`} />);
