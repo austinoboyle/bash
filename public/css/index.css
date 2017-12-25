@@ -6,6 +6,7 @@ body {
 
 html, body {
   font-family: 'Ubuntu Mono';
+  color: white;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -36,7 +37,34 @@ html, body {
   background-color: #300a24;
   outline: none;
   margin-left: 5px;
+  flex: 1;
+  flex-wrap: wrap;
 }
- 
 
- /*# sourceMappingURL= index.css.map */
+textarea.output {
+  width: 100%;
+  height: auto;
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  outline: none;
+  resize: none;
+  background-color: #300a24;
+  color: white;
+}
+
+.output-ls {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.output-ls div.file {
+  margin-right: 10px;
+}
+
+.dir {
+  color: #75a4ce;
+}
+/*# sourceMappingURL=index.css.map */
