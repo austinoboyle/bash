@@ -6,6 +6,7 @@ import OutputWrapper from '../components/outputs/OutputWrapper';
 export function submitCommand(text, path, currentDirTree, user) {
     return function(dispatch) {
         let allOutputs = [];
+        let finalCommandEffects = [];
         dispatch({
             type: 'SUBMIT_COMMAND'
         });
@@ -14,8 +15,12 @@ export function submitCommand(text, path, currentDirTree, user) {
             const currentState = {...store.getState().terminal};
             const command = listOfCommands[i];
             const {outputs, effects} = getOutputsAndEffects(command, currentState.path, currentState.dirTree);
-            for (let effect of effects) {
-                dispatch(effect);
+            if (i < listOfCommands.length - 1){
+                for (let effect of effects) {
+                    dispatch(effect);
+                }
+            } else {
+                finalCommandEffects = effects;
             }
             allOutputs = allOutputs.concat(outputs); 
         }
@@ -28,6 +33,10 @@ export function submitCommand(text, path, currentDirTree, user) {
                 </OutputWrapper>
             )
         });
+
+        for (let effect of finalCommandEffects){
+            dispatch(effect);
+        }
         
     };
 };
