@@ -1,5 +1,7 @@
+import {goToPath, parsePath} from '../util';
+
 const initialState = {
-    path: ['home', 'austinoboyle'],
+    path: ['/', 'home', 'austinoboyle'],
     isActive: true,
     user: 'austinoboyle',
     outputs: [],
@@ -15,6 +17,10 @@ const initialState = {
                 }
             }
         }
+    },
+    commandHistory: [],
+    vim: {
+        pathToFile: null
     }
 };
 
@@ -22,6 +28,13 @@ export function terminalReducer(state=initialState, action){
     let newDirTree = {...state.dirTree};
     let pointer = newDirTree;
     switch (action.type) {
+        case "SUBMIT_COMMAND": {
+            // Only add non-empty commands to history
+            const newCommand = action.payload.length > 0 ? [action.payload] : [];
+            return {...state, 
+                commandHistory: newCommand.concat(state.commandHistory)
+            };
+        }
         case "CLEAR":
             return {...state, outputs: []};
         case "NEW_OUTPUT":
@@ -47,7 +60,16 @@ export function terminalReducer(state=initialState, action){
             }
             delete pointer[action.payload.file];
             return {...state, dirTree: newDirTree}
-        
+        case 'INITIALIZE_VIM':
+            return {...state, isActive: false, vim: {pathToFile: action.payload}};
+        case 'QUIT_VIM':
+            return {...state, isActive: true};
+        case "WRITE":
+            const fullPathToFile = state.path.concat(state.vim.pathToFile);
+            const pathToContainerDir = fullPathToFile.slice(0, fullPathToFile.length - 1);
+            let containerDir = goToPath(state.dirTree, pathToContainerDir);
+            containerDir[fullPathToFile[fullPathToFile.length - 1]] = action.payload;
+            return {...state};
         default: 
             return state;
     }

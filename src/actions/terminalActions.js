@@ -8,7 +8,8 @@ export function submitCommand(text, path, currentDirTree, user) {
         let allOutputs = [];
         let finalCommandEffects = [];
         dispatch({
-            type: 'SUBMIT_COMMAND'
+            type: 'SUBMIT_COMMAND',
+            payload: text
         });
         const listOfCommands = text.split(/&&?/);
         for (var i = 0; i < listOfCommands.length; i++){

@@ -6,7 +6,6 @@ import TerminalInput from '../TerminalInput';
 class OutputWrapper extends Component {
     render() {
         const {path, user, text, currentDirTree, children} = this.props;
-        console.log("PATH IN OUTPUTWRAPPER", path);
         return (
             <div className="outputWrapper">
                 <TerminalInput

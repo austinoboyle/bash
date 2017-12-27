@@ -14,6 +14,13 @@ html, body {
   background-color: #300a24;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
 .terminalInput {
   display: flex;
   flex-direction: row;
@@ -41,7 +48,30 @@ html, body {
   flex-wrap: wrap;
 }
 
-textarea.output {
+#vim-wrapper {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#vim-wrapper #vim-editor {
+  flex: 1;
+}
+
+.ace_gutter {
+  width: 40px !important;
+}
+
+.ace_cursor {
+  border-left: 6px solid !important;
+}
+
+.ace_hidden-cursors {
+  display: none;
+}
+
+textarea {
   width: 100%;
   height: auto;
   margin: 0px;

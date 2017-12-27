@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import TerminalInput from './components/TerminalInput';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import getOutputsAndEffects from './middleware/getOutputsAndEffects';
 import {submitCommand} from './actions/terminalActions';
-import { goToPath } from './util';
+import { goToPath, pathStringToArray, arraysAreEqual } from './util';
 
 // Important Keys
 const ENTER = 13;
@@ -19,12 +18,15 @@ class Terminal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            commandHistory: [''],
+            commandHistory: [''].concat(props.commandHistory),
             historyIndex: 0
         };
     }
 
-    componentDidMount(){
+    componentWillReceiveProps(nextProps) {
+        if (!arraysAreEqual(nextProps.commandHistory, this.props.commandHistory)){
+            this.setState({commandHistory: [''].concat(nextProps.commandHistory)});            
+        }
     }
 
     handleTimeTravel(e, direction) {
@@ -47,19 +49,36 @@ class Terminal extends Component {
 
     handleAutoComplete(e){
         e.preventDefault(); //prevent tab from moving you around screen
-        const currentText = e.target.value;
+        const currentText = e.target.value.trim();
+        const {path, dirTree} = {...this.props};
+        let {commandHistory} = {...this.state};
+
         const words = currentText.split(/\s+/);
-        const currentWord = words[words.length - 1]; //TODO make this robust
+        let currentWord = words[words.length - 1]; //TODO make this robust
+        let dirsInCurrentCommand = pathStringToArray(currentWord);
+
+        let currentDir = goToPath(dirTree, path);
+
+        if (dirsInCurrentCommand.length > 1) {
+            currentWord = dirsInCurrentCommand[dirsInCurrentCommand.length - 1];
+            dirsInCurrentCommand = dirsInCurrentCommand.slice(0, dirsInCurrentCommand.length - 1);
+            currentDir = goToPath(dirTree, path.concat(dirsInCurrentCommand));
+        }
+
         if (currentWord.length < 1 || words.length < 2) {
             return;
         }
-        const {path, dirTree} = {...this.props};
-        let {commandHistory} = {...this.state};
-        const currentDir = goToPath(dirTree, ['/'].concat(path));
+
+        const lastSpaceIndex = currentText.lastIndexOf(' ');
+        let lastSlashIndex = currentText.lastIndexOf('/');
+        let indexToSlice = lastSlashIndex > lastSpaceIndex ? lastSlashIndex + 1 : lastSpaceIndex + 1; //+1 for inclusive slice
         const reString = '^' + currentWord;
         for (let name of Object.keys(currentDir)){
             if (name.match(new RegExp(reString))){
-                commandHistory[0] = currentText.replace(currentWord, name);
+                commandHistory[0] = currentText.slice(0, indexToSlice) + name;
+                if (typeof currentDir[name] === 'object'){
+                    commandHistory[0] += '/';
+                }
                 this.setState({
                     commandHistory,
                     historyIndex: 0
@@ -76,14 +95,8 @@ class Terminal extends Component {
         const submittedCommand = e.target.value;
         const {path, dirTree, user} = {...this.props};
         let {commandHistory} = {...this.state};
-        if (submittedCommand.length > 0) {
-            commandHistory.unshift('');
-        } else {
-            commandHistory[0] = '';
-        }
         this.props.submitCommand(submittedCommand, path, dirTree, user);
         this.setState({
-            commandHistory: commandHistory,
             historyIndex: 0
         });
     }
@@ -105,17 +118,6 @@ class Terminal extends Component {
             default:
                 return;
         }
-    }
-
-    handleClear(){
-        let {commandHistory} = {...this.state};
-        commandHistory[0] = 'clear';
-        commandHistory.unshift('');
-        this.setState({
-            outputs: [],
-            commandHistory,
-            historyIndex: 0
-        });
     }
 
     handleChange(e) {
@@ -151,7 +153,8 @@ function mapStateToProps(state) {
         path: state.terminal.path,
         user: state.terminal.user,
         dirTree: state.terminal.dirTree,
-        outputs: state.terminal.outputs
+        outputs: state.terminal.outputs,
+        commandHistory: state.terminal.commandHistory
     };
 }
 

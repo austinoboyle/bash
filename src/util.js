@@ -30,19 +30,21 @@ export function parseCommandText(text){
     };
 }
 
-export function validateDir(dirTree, path, dirStrings){
-    console.log('VALIDATING dirStrings', dirTree, path, dirStrings);
-    
-    for (let dir of ['/'].concat(path)) {
-        dirTree = dirTree[dir];
-        if (dirTree === null || dirTree === undefined) {
-            console.log('NO SUCH DIR');
-            
-            return false;
-        }
-    }
-    return true;
+export function arraysAreEqual(a1, a2){
+    return a1.length==a2.length && a1.every((v,i)=> v === a2[i]);
 }
+
+export function pathStringToArray(pathString) {
+    let pathArray = [];
+    if (pathString[0] === '/'){
+        pathArray.push('/');
+        pathString = pathString.slice(1);
+    } else if (pathString[0] === '~') {
+        pathArray = ['~'];
+        pathString = pathString.slice(1);
+    }
+    return pathArray.concat(pathString.split("/"));
+};
 
 
 /**
@@ -73,16 +75,14 @@ export function parsePath(pathArray) {
             case '.':
                 return accum;
             case '..':
-                return accum.slice(0,accum.length - 1);
+                return accum.length > 1 ? accum.slice(0,accum.length - 1) : accum;
+            // Absolute path given from root
+            case '/':
+                return ['/'];
+            case '~':
+                return ['/', 'home', 'austinoboyle'];
             default:
                 return accum.concat([dir]);
         }
     }, []);
-}
-
-var exports = {
-    parseCommandText,
-    goToPath,
-    parsePath,
-    validateDir
 };

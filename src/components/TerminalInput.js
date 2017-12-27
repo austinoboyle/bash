@@ -4,7 +4,7 @@ const TerminalInput = ({path, user, isReadOnly, handleChange, handleKeyDown, val
     <div className="terminalInput">
         <div className="computer">{`${user}@austinoboyle.com`}</div>
         <div>:</div>
-        <div className="path">{('/' + path.join("/")).replace(TILDE_PATH, '~')}</div>
+        <div className="path">{('/' + path.slice(1).join("/")).replace(TILDE_PATH, '~')}</div>
         <div className="test">$</div>
         <input
             spellCheck={false}

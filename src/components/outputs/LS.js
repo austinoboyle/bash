@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import File from './File';
 
 const LS = ({dirForCommand, flags}) => {
-    console.log("NEW PROPS", dirForCommand);
     return (
         <div className="output-ls">
             {   
