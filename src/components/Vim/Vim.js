@@ -9,9 +9,6 @@ import { goToPath, pathStringToArray } from '../../util';
 import Vim_Command from './Vim_Command';
 import Vim_Editor from './Vim_Editor';
 
-import 'brace/mode/java';
-import 'brace/theme/github';
-
 // Important Keys
 const ENTER = 13;
 const TAB = 9;
@@ -58,7 +55,8 @@ class Vim extends Component {
             <div id="vim-wrapper">
                 <Vim_Editor 
                     submitCommand={(e) => this.submitCommand(e)}
-                    initialText={initialText} 
+                    initialText={initialText}
+                    filename={pathToFile[pathToFile.length - 1]} 
                 />
             </div>
         );
@@ -75,7 +73,6 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-
     }, dispatch);
 }
 
