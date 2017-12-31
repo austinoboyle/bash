@@ -55,7 +55,7 @@ function getLanguageFromFilename(filename) {
     }
 }
 
-class Vim_Editor extends Component {
+class VimEditor extends Component {
     getValue() {
         return this.editor.getValue();
     }
@@ -90,7 +90,7 @@ class Vim_Editor extends Component {
     }
 
     render() {
-        const {isReadOnly, filename} = {...this.props};
+        const {filename} = {...this.props};
         return <AceEditor
             mode={getLanguageFromFilename(filename)}
             theme="monokai"
@@ -120,4 +120,4 @@ function mapDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(null, mapDispatchToProps)(Vim_Editor);
+export default connect(null, mapDispatchToProps)(VimEditor);

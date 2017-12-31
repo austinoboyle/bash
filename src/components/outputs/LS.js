@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import File from './File';
 
 const LS = ({dirForCommand, flags}) => {

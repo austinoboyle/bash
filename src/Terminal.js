@@ -94,7 +94,6 @@ class Terminal extends Component {
         // console.log("TODO: SUBMIT");
         const submittedCommand = e.target.value;
         const {path, dirTree, user} = {...this.props};
-        let {commandHistory} = {...this.state};
         this.props.submitCommand(submittedCommand, path, dirTree, user);
         this.setState({
             historyIndex: 0
@@ -130,7 +129,7 @@ class Terminal extends Component {
 
     render() {
         const {path, user, outputs} = this.props;
-        const {commandHistory, historyIndex, text} = this.state;
+        const {commandHistory, historyIndex} = this.state;
         return (
             <div className = "terminal" >
                 {outputs.length > 0  && <div className="commandHistory">{outputs}</div>}
@@ -138,8 +137,8 @@ class Terminal extends Component {
                 <TerminalInput 
                     handleChange={(e) => this.handleChange(e)}
                     handleKeyDown={(e) => this.handleKeyDown(e)}
-                    path={this.props.path}
-                    user={this.props.user}
+                    path={path}
+                    user={user}
                     isReadOnly={false}
                     value={commandHistory[historyIndex]}  
                 />
