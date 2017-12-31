@@ -5,12 +5,55 @@ import {quit, write} from '../../actions/vimActions';
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
+
+// Brace syntax highlighters
 import 'brace/mode/java';
+import 'brace/mode/jsx';
 import 'brace/mode/javascript';
+import 'brace/mode/markdown';
+import 'brace/mode/python';
+import 'brace/mode/html';
+import 'brace/mode/xml';
+import 'brace/mode/ruby';
+import 'brace/mode/css';
+import 'brace/mode/sass';
+
+// Theme & Keybindings
 import 'brace/theme/monokai';
 import 'brace/keybinding/vim';
-const ace = require("brace")
-const Vim = ace.acequire('ace/keyboard/vim').CodeMirror.Vim
+
+const Vim = brace.acequire('ace/keyboard/vim').CodeMirror.Vim
+
+function getLanguageFromFilename(filename) {
+    console.log('GETTING LANGUAGE FOR...', filename);
+    const mapExtensionToFiletype = {
+        js: 'javascript',
+        jsx: 'jsx',
+        py: 'python',
+        markdown: 'markdown',
+        md: 'markdown',
+        html: 'html',
+        rb: 'ruby',
+        java: 'java',
+        xml: 'xml',
+        css: 'css',
+        scss: 'sass',
+        sass: 'sass'
+    };
+    try {
+        const splitFilenameArray = filename.split(".");
+        const ext = splitFilenameArray[splitFilenameArray.length - 1];
+        const filetype = mapExtensionToFiletype[ext];
+        console.log('FILETYPE IS...', filetype);
+        if (filetype !== undefined) {
+            return filetype;
+        }
+        return 'text';
+    } catch (e) {
+        console.log('ERROR', e);
+        return 'text';
+    }
+}
 
 class Vim_Editor extends Component {
     getValue() {
@@ -43,12 +86,13 @@ class Vim_Editor extends Component {
         this.editor = this.refs.Vim_Editor.editor;
         this.setValue(this.props.initialText);
         this.editor.focus();
+        this.editor.navigateTo(0,0);
     }
 
     render() {
-        const {isReadOnly} = {...this.props};
+        const {isReadOnly, filename} = {...this.props};
         return <AceEditor
-            mode="javascript"
+            mode={getLanguageFromFilename(filename)}
             theme="monokai"
             ref="Vim_Editor"
             // onChange={onChange}
@@ -60,7 +104,9 @@ class Vim_Editor extends Component {
             test`}
             name="vim-editor"
             keyboardHandler="vim"
+            enableLiveAutocompletion={true}
             setOptions={{
+                enableLiveAutocompletion: true,
                 cursorStyle: "wide"
             }}
         />;
