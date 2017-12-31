@@ -1,4 +1,5 @@
 import {goToPath} from '../util';
+import {resume} from './content/resume';
 
 const initialState = {
     path: ['/', 'home', 'austinoboyle'],
@@ -13,7 +14,7 @@ const initialState = {
                         'animated_menus.sh': '/animated-menus',
                         'bash.sh': '/bash'
                     },
-                    'resume.md': "Austin O'Boyle - Resume"
+                    'resume.md': resume
                 }
             }
         }
