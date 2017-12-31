@@ -1,6 +1,5 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import Terminal from './Terminal';
 import Vim from './components/Vim/Vim';
 

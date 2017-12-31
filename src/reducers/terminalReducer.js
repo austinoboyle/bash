@@ -1,4 +1,4 @@
-import {goToPath, parsePath} from '../util';
+import {goToPath} from '../util';
 
 const initialState = {
     path: ['/', 'home', 'austinoboyle'],

@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import TerminalInput from '../TerminalInput';
 
 class OutputWrapper extends Component {
     render() {
+        // eslint-disable-next-line
         const {path, user, text, currentDirTree, children} = this.props;
         return (
             <div className="outputWrapper">
                 <TerminalInput
-                    path={this.props.path}
-                    user={this.props.user}
+                    path={path}
+                    user={user}
                     isReadOnly={true}
                     value={text}
                 />

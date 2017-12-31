@@ -1,26 +1,12 @@
 import React, {Component} from 'react';
 
-import TerminalInput from '../../components/TerminalInput';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {submitCommand} from '../../actions/terminalActions';
-import { goToPath, pathStringToArray } from '../../util';
+import { goToPath } from '../../util';
 
-import Vim_Command from './Vim_Command';
-import Vim_Editor from './Vim_Editor';
+import VimEditor from './VimEditor';
 
-// Important Keys
-const ENTER = 13;
-const TAB = 9;
-const UPARROW = 38;
-const DOWNARROW = 40;
-const ESC = 27;
-const I = 73;
-const SEMICOLON = 186;
 
-// Directions
-const FORWARD = 1;
-const BACKWARD = -1;
 class Vim extends Component {
     constructor(props) {
         super(props);
@@ -49,11 +35,12 @@ class Vim extends Component {
     }
 
     render() {
+        // eslint-disable-next-line
         const {terminalPath, pathToFile, dirTree} = {...this.props};
         const {initialText} = {...this.state};
         return (
             <div id="vim-wrapper">
-                <Vim_Editor 
+                <VimEditor 
                     submitCommand={(e) => this.submitCommand(e)}
                     initialText={initialText}
                     filename={pathToFile[pathToFile.length - 1]} 
