@@ -84,3 +84,12 @@ export function rm(path, file) {
         }
     };
 }
+
+export function execute(url) {
+    return function(dispatch) {
+        dispatch({
+            type: 'EXECUTE'
+        });
+        window.open('https://www.austinoboyle.com' + url, '_blank');
+    };
+}
