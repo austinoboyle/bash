@@ -1,3 +1,5 @@
+import {PROFILE} from './constants';
+
 /**
  * Parse a user's input text, return an object:
  *  {command, args, kwflags, flags, dirStrings }
@@ -71,7 +73,7 @@ export function pathStringToArray(pathString) {
         isAbsolutePath = true;
         pathString = pathString.slice(1);
     } else if (pathString[0] === '~') {
-        pathArray = ['~'];
+        pathArray = PROFILE.HOME_DIR_ARR;
         pathString = pathString.slice(1);
     }
     if (isAbsolutePath) {
@@ -79,6 +81,24 @@ export function pathStringToArray(pathString) {
     }
     
     return pathArray.concat(pathString.split("/")).filter(dir => dir.length > 0);
+};
+
+/**
+ * Stringify a path array
+ * 
+ * @export
+ * @param {String} pathArr path array
+ * @returns {Array<String>} stringified path
+ */
+export function pathArrayToString(pathArr) {
+    let stringifiedPath = '';
+    if (pathArr.length < 1) {
+        return stringifiedPath;
+    } else if (pathArr[0] === '/') {
+        stringifiedPath += '/';
+        pathArr = pathArr.slice(1);
+    }
+    return stringifiedPath + pathArr.join('/');
 };
 
 
@@ -124,9 +144,18 @@ export function parsePath(pathArray) {
             case '/':
                 return ['/'];
             case '~':
-                return ['/', 'home', 'austinoboyle'];
+                return PROFILE.HOME_DIR_ARR;
             default:
                 return accum.concat([dir]);
         }
     }, []);
 };
+
+export function getFileExtension(filename) {
+    const splitFileName = filename.split('.');
+    try {
+        return splitFileName[splitFileName.length - 1].toLowerCase();
+    } catch (e) {
+        return null;
+    }
+}
