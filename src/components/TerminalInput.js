@@ -1,10 +1,12 @@
 import React from 'react';
-const TILDE_PATH = '/home/austinoboyle';
+import {pathArrayToString} from '../util';
+import {PROFILE} from '../constants';
+
 const TerminalInput = ({path, user, isReadOnly, handleChange, handleKeyDown, value}) => (
     <div className="terminalInput">
         <div className="computer">{`${user}@austinoboyle.com`}</div>
         <div>:</div>
-        <div className="path">{('/' + path.slice(1).join("/")).replace(TILDE_PATH, '~')}</div>
+        <div className="path">{pathArrayToString(path).replace(PROFILE.HOME_DIR_STRING, '~')}</div>
         <div className="test">$</div>
         <input
             spellCheck={false}

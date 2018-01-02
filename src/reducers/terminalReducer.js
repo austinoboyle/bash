@@ -1,8 +1,9 @@
 import {goToPath} from '../util';
 import {resume} from './content/resume';
+import {PROFILE} from '../constants';
 
 const initialState = {
-    path: ['/', 'home', 'austinoboyle'],
+    path: PROFILE.HOME_DIR_ARR,
     isActive: true,
     user: 'austinoboyle',
     outputs: [],
