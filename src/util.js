@@ -33,7 +33,7 @@ export function parseCommandText(text){
 
     const dirStrings = args
         .filter(arg => new RegExp('^[^-]+').test(arg))
-        .map(arg => arg.replace(/\/$/, ""));
+        .map(arg => arg.replace(/(.+)\/$/, "$1"));
     console.log('TEXT:', text);
     console.log(command, args, kwflags,flags, dirStrings);
     return {
@@ -66,14 +66,19 @@ export function arraysAreEqual(a1, a2){
  */
 export function pathStringToArray(pathString) {
     let pathArray = [];
+    let isAbsolutePath = false;
     if (pathString[0] === '/'){
-        pathArray.push('/');
+        isAbsolutePath = true;
         pathString = pathString.slice(1);
     } else if (pathString[0] === '~') {
         pathArray = ['~'];
         pathString = pathString.slice(1);
     }
-    return pathArray.concat(pathString.split("/"));
+    if (isAbsolutePath) {
+        pathArray.unshift('/');
+    }
+    
+    return pathArray.concat(pathString.split("/")).filter(dir => dir.length > 0);
 };
 
 
