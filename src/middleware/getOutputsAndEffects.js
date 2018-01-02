@@ -8,6 +8,19 @@ import PlainText from '../components/outputs/PlainText';
 import LS from '../components/outputs/LS';
 import {PROFILE} from '../constants';
 
+/**
+ * Get the outputs and effects that a command should invoke
+ * 
+ * @export
+ * @param {String} text user input to be parsed
+ * @param {Array<String>} path current path in the terminal
+ * @param {Object} currentDirTree current full dir tree
+ * @param {String} user username
+ * @returns {Object} {outputs, effects}:
+ * - outputs {Array<JSX>}: array of child components of an OutputWrapper for the command
+ * - effects {Array<Object>} array of actions to be dispatched
+ * 
+ */
 export default function getOutputsAndEffects(text, path, currentDirTree, user){
     // eslint-disable-next-line
     let {command, kwflags, flags, dirStrings, args} = parseCommandText(text);
@@ -179,9 +192,9 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             break;
             
         default:
+            // Check for a path to an executable
             const couldBeDirOrFile = command.includes('/') || command === '~';
             if (couldBeDirOrFile) {
-                // Check for a path to an executable
                 const relativePath = pathStringToArray(command);
                 const possiblePathToFile = parsePath(path.concat(relativePath));
                 const possibleFile = goToPath(currentDirTree, possiblePathToFile);
