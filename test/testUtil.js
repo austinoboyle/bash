@@ -28,5 +28,8 @@ parseCommandText('ls');
 parseCommandText('cd --');
 parseCommandText('cd -');
 
+console.log(util.pathStringToArray('test/'));
+
+
 console.log(parsePath(['/', 'home', 'austinoboyle', '/', 'home']));
 
