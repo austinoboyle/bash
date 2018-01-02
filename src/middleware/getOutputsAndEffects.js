@@ -1,20 +1,19 @@
 import React from 'react';
 
-import {parseCommandText, goToPath, parsePath, pathStringToArray} from '../util';
-import {cd, mkdir, rm, touch, clear} from '../actions/terminalActions';
+import {parseCommandText, goToPath, parsePath, pathStringToArray, getFileExtension, pathArrayToString} from '../util';
+import {cd, mkdir, rm, touch, clear, execute} from '../actions/terminalActions';
 import {initializeVim} from '../actions/vimActions';
 import Error from '../components/outputs/Error';
 import PlainText from '../components/outputs/PlainText';
 import LS from '../components/outputs/LS';
+import {PROFILE} from '../constants';
 
 export default function getOutputsAndEffects(text, path, currentDirTree, user){
     // eslint-disable-next-line
     let {command, kwflags, flags, dirStrings, args} = parseCommandText(text);
     currentDirTree = JSON.parse(JSON.stringify(currentDirTree));
-    let paths = [];
-    if (dirStrings.length === 0) {
-        paths = [path];
-    } else {
+    let paths = [path];
+    if (dirStrings.length > 0) {
         paths = dirStrings.map(dirString => {
             return path.concat(pathStringToArray(dirString));
         });
@@ -53,7 +52,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             if (paths.length > 1) {
                 outputs.push(<Error msg={`${command}: too many arguments.`}/>);
             } else if (dirStrings.length === 0) {
-                effects.push(cd(['/', 'home', 'austinoboyle']));
+                effects.push(cd(PROFILE.HOME_DIR_ARR));
             } else {
                 const fullPath = paths[0];
                 const dirForCommand = goToPath(currentDirTree, fullPath);
@@ -180,7 +179,23 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             break;
             
         default:
-            outputs.push(<Error msg={`${command}: command not found`}/>);
+            const couldBeDirOrFile = command.includes('/') || command === '~';
+            if (couldBeDirOrFile) {
+                // Check for a path to an executable
+                const relativePath = pathStringToArray(command);
+                const possiblePathToFile = parsePath(path.concat(relativePath));
+                const possibleFile = goToPath(currentDirTree, possiblePathToFile);
+                const fileName = possiblePathToFile[possiblePathToFile.length - 1];
+                if (typeof possibleFile === 'string' && getFileExtension(fileName) === 'sh')  {
+                    effects.push(execute(possibleFile));
+                } else if (typeof possibleFile === 'object') {
+                    outputs.push(<PlainText text={`bash: ${pathArrayToString(relativePath)}: Is a directory`} />);
+                } else {
+                    outputs.push(<Error msg={`bash: ${pathArrayToString(relativePath)}: No such file or directory`} />);
+                }
+            } else {
+                outputs.push(<Error msg={`${command}: command not found`}/>);
+            }
     }
     return {
         outputs,
