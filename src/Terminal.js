@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import TerminalInput from './components/TerminalInput';
+import TerminalInput from './components/TerminalInput/TerminalInput';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {submitCommand} from './actions/terminalActions';

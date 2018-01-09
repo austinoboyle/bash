@@ -3,9 +3,9 @@ import React from 'react';
 import {parseCommandText, goToPath, parsePath, pathStringToArray, getFileExtension, pathArrayToString} from '../util';
 import {cd, mkdir, rm, touch, clear, execute} from '../actions/terminalActions';
 import {initializeVim} from '../actions/vimActions';
-import Error from '../components/outputs/Error';
-import PlainText from '../components/outputs/PlainText';
-import LS from '../components/outputs/LS';
+import Error from '../components/outputs/Error/Error';
+import PlainText from '../components/outputs/PlainText/PlainText';
+import LS from '../components/outputs/LS/LS';
 import {PROFILE} from '../constants';
 
 /**

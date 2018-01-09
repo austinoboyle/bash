@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import Terminal from './Terminal';
-import Vim from './components/Vim/Vim';
+import Vim from './components/Vim/Vim/Vim';
 
 const App = ({terminal, vim}) => {
     return terminal.isActive ? <Terminal /> : <Vim />;

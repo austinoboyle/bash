@@ -1,0 +1,11 @@
+
+$dir-color: #75a4ce;
+
+.file{
+    margin-right: 10px;
+}
+
+.dir{
+    @extend .file;
+    color: $dir-color;
+}

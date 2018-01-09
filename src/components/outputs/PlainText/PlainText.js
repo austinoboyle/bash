@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-
+import styles from './PlainText.scss';
 class PlainText extends Component {
     constructor(props){
         super(props);
@@ -41,9 +41,9 @@ class PlainText extends Component {
                 ref={(el) => {this.textarea = el;}}
                 readOnly={true}
                 spellCheck={false}
-                className="output"
                 value={text}
                 rows={rows}
+                className={styles.text}
             />
         );
     }

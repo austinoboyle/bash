@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {quit, write} from '../../actions/vimActions';
+import {quit, write} from '../../../actions/vimActions';
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
+
+import styles from './VimEditor.scss';
 
 // Brace syntax highlighters
 import 'brace/mode/java';

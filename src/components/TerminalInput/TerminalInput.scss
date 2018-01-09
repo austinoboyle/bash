@@ -1,0 +1,28 @@
+@import '../../_base';
+
+.terminalInput {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    :global {
+        .computer {
+            color: $user-color;
+            font-weight: bold;
+        }
+        .path{
+            color: $dir-color;
+        }
+        .command {
+            color: $main-font-color;
+            margin: 0px;
+            padding: 0px;
+            border: none;
+            background-color: $background-color;
+            outline: none;
+            margin-left: 5px; 
+            flex: 1;
+            flex-wrap: wrap;    
+        }
+    }
+    
+}

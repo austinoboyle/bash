@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import TerminalInput from '../TerminalInput';
+import TerminalInput from '../../TerminalInput/TerminalInput';
 
 class OutputWrapper extends Component {
     render() {

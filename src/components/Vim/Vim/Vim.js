@@ -2,10 +2,10 @@ import React, {Component} from 'react';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import { goToPath } from '../../util';
+import { goToPath } from '../../../util';
 
-import VimEditor from './VimEditor';
-
+import VimEditor from '../VimEditor/VimEditor';
+import styles from './Vim.scss';
 
 class Vim extends Component {
     constructor(props) {
@@ -39,7 +39,7 @@ class Vim extends Component {
         const {terminalPath, pathToFile, dirTree} = {...this.props};
         const {initialText} = {...this.state};
         return (
-            <div id="vim-wrapper">
+            <div className={styles.wrapper}>
                 <VimEditor 
                     submitCommand={(e) => this.submitCommand(e)}
                     initialText={initialText}

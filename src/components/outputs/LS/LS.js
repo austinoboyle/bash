@@ -1,9 +1,11 @@
 import React from 'react';
-import File from './File';
+import File from '../File/File';
+
+import styles from './LS.scss';
 
 const LS = ({dirForCommand, flags}) => {
     return (
-        <div className="output-ls">
+        <div className={styles.wrapper}>
             {   
                 Object.keys(dirForCommand).map(name => {
                     const type = typeof dirForCommand[name] === 'object' ? 'dir' : 'file';
