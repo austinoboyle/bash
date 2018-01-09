@@ -107,6 +107,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             });
             break;
         case 'mkdir':
+            // Must have a non-flag argument
             if (dirStrings.length < 1) {
                 return <Error msg={`mkdir: missing operand`} />;                   
             } else {
@@ -124,6 +125,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             }
             break;
         case 'rm':
+            // 
             if (dirStrings.length < 1) {
                 outputs.push(<Error msg={`rm: missing operand`} />);                   
             } else {
