@@ -9,9 +9,9 @@ const LS = ({dirForCommand}) => {
     return (
         <div className={styles.wrapper}>
             {   
-                Object.keys(dirForCommand).map(name => {
+                Object.keys(dirForCommand).map((name, i) => {
                     const type = typeof dirForCommand[name] === 'object' ? 'dir' : 'file';
-                    return <File type={type} name={name}/>;
+                    return <File key={i} type={type} name={name}/>;
                 })
             }
         </div>
