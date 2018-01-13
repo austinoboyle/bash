@@ -1,7 +1,6 @@
 import React from 'react';
 import ConnectedApp, {App} from './App';
-import {shallow, mount} from 'enzyme';
-import {Provider} from 'react-redux';
+import {shallow} from 'enzyme';
 import thunk from 'redux-thunk';
 import configureMockStore from 'redux-mock-store';
 

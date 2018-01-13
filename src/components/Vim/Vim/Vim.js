@@ -7,27 +7,17 @@ import { goToPath } from '../../../util';
 import VimEditor from '../VimEditor/VimEditor';
 import styles from './Vim.scss';
 
-class Vim extends Component {
+import PropTypes from 'prop-types';
+import exact from 'prop-types-exact';
+
+export class Vim extends Component {
     constructor(props) {
         super(props);
-        console.log('PATHTOFILE', props.pathToFile);
-        const fullPathToFile = props.terminalPath.concat(props.pathToFile);
+        const fullPathToFile = props.terminalPath.concat(props.relativepathToFile);
         const fileText = goToPath(props.dirTree, fullPathToFile);
         this.state = {
             initialText: fileText
         };
-    }
-
-    handleTextChange(e) {
-        this.setState({
-            text: e.target.value
-        });
-    }
-
-    handleCommandChange(newValue) {
-        this.setState({
-            command: newValue
-        });
     }
 
     submitCommand(command){
@@ -36,31 +26,32 @@ class Vim extends Component {
 
     render() {
         // eslint-disable-next-line
-        const {terminalPath, pathToFile, dirTree} = {...this.props};
+        const {terminalPath, relativepathToFile, dirTree} = {...this.props};
         const {initialText} = {...this.state};
         return (
             <div className={styles.wrapper}>
                 <VimEditor 
                     submitCommand={(e) => this.submitCommand(e)}
                     initialText={initialText}
-                    filename={pathToFile[pathToFile.length - 1]} 
+                    filename={relativepathToFile[relativepathToFile.length - 1]} 
                 />
             </div>
         );
     }
 }
 
+Vim.propTypes = exact({
+    terminalPath: PropTypes.arrayOf(PropTypes.string),
+    relativepathToFile: PropTypes.arrayOf(PropTypes.string),
+    dirTree: PropTypes.object
+});
+
 function mapStateToProps(state) {
     return {
         terminalPath: state.terminal.path,
-        pathToFile: state.terminal.vim.pathToFile,
+        relativepathToFile: state.terminal.vim.pathToFile,
         dirTree: state.terminal.dirTree
     };
 }
 
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Vim);
+export default connect(mapStateToProps)(Vim);
