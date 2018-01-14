@@ -5,7 +5,7 @@ import registerServiceWorker from './registerServiceWorker';
 import store from './store';
 import App from './App';
 
-const app = (
+export const app = (
     <Provider store={store}>
         <App />
     </Provider>

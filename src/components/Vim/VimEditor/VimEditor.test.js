@@ -14,7 +14,8 @@ describe('VimEditor', () => {
         props = {
             open: jest.fn(),
             write: jest.fn(),
-            filename: 'test.txt'
+            filename: 'test.txt',
+            initialText: 'test'
         };
         defineExSpy = sinon.spy(Vim, 'defineEx');
         wrapper = shallow(<VimEditor {...props}/>);
@@ -66,7 +67,13 @@ describe('Connected VimEditor', () => {
             }
         }
     });
-    const wrapper = shallow(<ConnectedVimEditor store={store}/>);
+    const props = {
+        open: jest.fn(),
+        write: jest.fn(),
+        filename: 'test.txt',
+        initialText: 'test'
+    };
+    const wrapper = shallow(<ConnectedVimEditor {...props} store={store} />);
     it('Renders', () => {
         expect(wrapper.length).toBe(1);
     })
