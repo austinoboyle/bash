@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import Terminal from './Terminal';
+import Terminal from './components/Terminal/Terminal';
 import Vim from './components/Vim/Vim/Vim';
 import PropTypes from 'prop-types';
 import exact from 'prop-types-exact';

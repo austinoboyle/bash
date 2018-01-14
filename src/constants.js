@@ -8,6 +8,11 @@ export const KEYS = {
     SEMICOLON: 186,
 };
 
+export const DIRECTIONS = {
+    FORWARD: 1,
+    BACKWARD: -1
+};
+
 export const PROFILE = {
     USER: 'austinoboyle',
     COMPUTER: 'austinoboyle.com',
