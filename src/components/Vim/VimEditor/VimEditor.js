@@ -3,10 +3,15 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {quit, write} from '../../../actions/vimActions';
 
+import {getLanguageFromFilename} from '../../../util';
+
 import brace from 'brace';
 import AceEditor from 'react-ace';
 
 import styles from './VimEditor.scss';
+
+import PropTypes from 'prop-types';
+import exact from 'prop-types-exact';
 
 // Brace syntax highlighters
 import 'brace/mode/java';
@@ -24,40 +29,9 @@ import 'brace/mode/sass';
 import 'brace/theme/monokai';
 import 'brace/keybinding/vim';
 
-const Vim = brace.acequire('ace/keyboard/vim').CodeMirror.Vim
+export const Vim = brace.acequire('ace/keyboard/vim').CodeMirror.Vim;
 
-function getLanguageFromFilename(filename) {
-    console.log('GETTING LANGUAGE FOR...', filename);
-    const mapExtensionToFiletype = {
-        js: 'javascript',
-        jsx: 'jsx',
-        py: 'python',
-        markdown: 'markdown',
-        md: 'markdown',
-        html: 'html',
-        rb: 'ruby',
-        java: 'java',
-        xml: 'xml',
-        css: 'css',
-        scss: 'sass',
-        sass: 'sass'
-    };
-    try {
-        const splitFilenameArray = filename.split(".");
-        const ext = splitFilenameArray[splitFilenameArray.length - 1];
-        const filetype = mapExtensionToFiletype[ext];
-        console.log('FILETYPE IS...', filetype);
-        if (filetype !== undefined) {
-            return filetype;
-        }
-        return 'text';
-    } catch (e) {
-        console.log('ERROR', e);
-        return 'text';
-    }
-}
-
-class VimEditor extends Component {
+export class VimEditor extends Component {
     getValue() {
         return this.editor.getValue();
     }
@@ -67,25 +41,23 @@ class VimEditor extends Component {
     }
 
     componentDidMount(){
-        Vim.defineEx("write", "w", (cm, input) => {
-            this.props.write(this.getValue());
-        });
-        Vim.defineEx("quit", "q", (cm, input) => {
-            this.props.quit();
-        });
-        Vim.defineEx("q!", "q!", (cm, input) => {
-            this.props.quit();
-        });
-        // Vim.map("wq", "writequit", "Normal");
-        Vim.defineEx("wq", "wq", (cm, input) => {
-            this.props.write(this.getValue());
-            this.props.quit();
-        });
-        Vim.defineEx("wq!", "wq!", (cm, input) => {
-            this.props.write(this.getValue());
-            this.props.quit();
-        });
-        this.editor = this.refs.Vim_Editor.editor;
+        if (!this.refs.Vim_Editor){
+            this.editor = {
+                setValue: () => {},
+                getValue: () => {},
+                focus: () => {},
+                navigateTo: () => {}
+            };
+        } else {
+            this.editor = this.refs.Vim_Editor.editor;
+        }
+        const quit = (cm, input) => {this.props.quit()};
+        const write = (cm, input) => {this.props.write(this.getValue())};
+        Vim.defineEx("write", "w", write);
+        Vim.defineEx("quit", "q", quit);
+        Vim.defineEx("q!", "q!", quit);
+        Vim.defineEx("wq", "wq", () => {write(); quit();})
+        Vim.defineEx("wq!", "wq!",() => {write(); quit();})
         this.setValue(this.props.initialText);
         this.editor.focus();
         this.editor.navigateTo(0,0);
@@ -115,11 +87,16 @@ class VimEditor extends Component {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators({
-        quit,
-        write
-    }, dispatch);
-}
+VimEditor.propTypes = exact({
+    filename: PropTypes.string.isRequired,
+    initialText: PropTypes.string.isRequired,
+    write: PropTypes.func.isRequired,
+    quit: PropTypes.func.isRequired,
+})
 
-export default connect(null, mapDispatchToProps)(VimEditor);
+const actions = {
+    quit,
+    write
+};
+
+export default connect(null, actions)(VimEditor);

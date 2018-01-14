@@ -18,5 +18,4 @@ function mapStateToProps(state) {
         isTerminalActive: state.terminal.isActive
     };
 }
-
-export default connect(mapStateToProps, null)(App);
+export default connect(mapStateToProps)(App);
