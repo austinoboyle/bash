@@ -3,5 +3,6 @@ import ReactDOM from 'react-dom';
 import {app} from './index';
 
 it('renders without crashing', () => {
-    ReactDOM.render(app, <div></div>);
+    const div = document.createElement('div');
+    ReactDOM.render(app, div);
 });
