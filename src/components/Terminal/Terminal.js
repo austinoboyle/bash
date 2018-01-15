@@ -25,12 +25,10 @@ export class Terminal extends Component {
     handleTimeTravel(e, direction) {
         e.preventDefault();
         let {historyIndex, commandHistory} = {...this.state};
-        switch(direction) {
-            case DIRECTIONS.FORWARD:
-                historyIndex -=1;
-                break;
-            default:
-                historyIndex += 1;
+        if(direction === DIRECTIONS.FORWARD) {
+            historyIndex -= 1
+        } else {
+            historyIndex += 1;
         }
         if (historyIndex >= 0 && historyIndex < commandHistory.length) {
             this.setState({
@@ -50,14 +48,9 @@ export class Terminal extends Component {
         if (currentWord[currentWord.length - 1] === '/'){
             dirsInCurrentCommand.push('');          
         }
-        console.log('DIRS IN COMMAND', dirsInCurrentCommand);
-        let currentDir = goToPath(dirTree, path);
-
-        if (dirsInCurrentCommand.length > 1) {
-            currentWord = dirsInCurrentCommand[dirsInCurrentCommand.length - 1];
-            dirsInCurrentCommand = dirsInCurrentCommand.slice(0, dirsInCurrentCommand.length - 1);
-            currentDir = goToPath(dirTree, path.concat(dirsInCurrentCommand));
-        }
+        currentWord = dirsInCurrentCommand[dirsInCurrentCommand.length - 1];
+        dirsInCurrentCommand = dirsInCurrentCommand.slice(0, dirsInCurrentCommand.length - 1);
+        const currentDir = goToPath(dirTree, path.concat(dirsInCurrentCommand));
 
         const matchingProperties = getMatchingPropertyNames(currentDir, '^' + currentWord);
         if (matchingProperties.length === 0) {

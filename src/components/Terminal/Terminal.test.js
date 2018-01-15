@@ -52,7 +52,9 @@ describe('Event Handlers on TerminalInput', () => {
             dirTree: {'/': {
                 'home': {
 
-                }
+                },
+                'test.txt': 'test',
+                'test.md': 
             }},
             outputs: [],
             commandHistory: ['ls'],
@@ -90,7 +92,7 @@ describe('Event Handlers on TerminalInput', () => {
             expect(props.submitCommand).toHaveBeenCalledWith(submittedCommand, path, dirTree, user);
         });
         it('TAB', () => {
-            const e = {...defaultEvent, keyCode: KEYS.TAB};
+            const e = {...defaultEvent, keyCode: KEYS.TAB, target: { value: 'cat te'}};
             wrapper.find('TerminalInput').props().handleKeyDown(e);
             const submittedCommand = e.target.value;
             const {path, dirTree, user} = {...props};
