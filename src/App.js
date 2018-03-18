@@ -1,18 +1,21 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import Terminal from './Terminal';
-import Vim from './components/Vim/Vim';
+import Terminal from './components/Terminal/Terminal';
+import Vim from './components/Vim/Vim/Vim';
+import PropTypes from 'prop-types';
+import exact from 'prop-types-exact';
 
-const App = ({terminal, vim}) => {
-    return terminal.isActive ? <Terminal /> : <Vim />;
-    // return <Vim />;
+export const App = ({isTerminalActive}) => {
+    return isTerminalActive ? <Terminal /> : <Vim />;
 }
+
+App.propTypes = exact({
+    isTerminalActive: PropTypes.bool
+});
 
 function mapStateToProps(state) {
     return {
-        terminal: state.terminal,
-        vim: state.vim
+        isTerminalActive: state.terminal.isActive
     };
 }
-
-export default connect(mapStateToProps, null)(App);
+export default connect(mapStateToProps)(App);

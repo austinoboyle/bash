@@ -1,7 +1,7 @@
 import React from 'react';
 import store from '../store';
 import getOutputsAndEffects from '../middleware/getOutputsAndEffects';
-import OutputWrapper from '../components/outputs/OutputWrapper';
+import OutputWrapper from '../components/outputs/OutputWrapper/OutputWrapper';
 
 export function submitCommand(text, path, currentDirTree, user) {
     return function(dispatch) {

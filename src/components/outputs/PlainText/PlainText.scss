@@ -1,0 +1,12 @@
+@import '../../../_base';
+.text{
+    width: 100%;
+    height: auto;
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    outline: none;
+    resize: none;
+    background-color: $background-color;
+    color: $main-font-color;
+}

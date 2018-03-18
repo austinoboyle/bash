@@ -1,4 +1,7 @@
 import React, {Component} from 'react';
+import styles from './PlainText.scss';
+import PropTypes from 'prop-types';
+import exact from 'prop-types-exact';
 
 class PlainText extends Component {
     constructor(props){
@@ -9,10 +12,8 @@ class PlainText extends Component {
     }
 
     resize(e){
-        if (this.textarea !== null){
-            console.log('RESIZE');
+        if (this.textarea !== null && this.textarea !== undefined){
             const cols = this.textarea.cols;
-            console.log('COLS', cols);
             let numRows = 0;
             this.props.text.split("\n").forEach((line) => {
                 numRows += 1;
@@ -41,12 +42,16 @@ class PlainText extends Component {
                 ref={(el) => {this.textarea = el;}}
                 readOnly={true}
                 spellCheck={false}
-                className="output"
                 value={text}
                 rows={rows}
+                className={styles.text}
             />
         );
     }
-};  
+};
+
+PlainText.propTypes = exact({
+    text: PropTypes.string.isRequired
+});
 
 export default PlainText;

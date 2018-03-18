@@ -1,0 +1,16 @@
+:global {
+    #vim-editor {
+        flex: 1;
+        .ace_gutter {
+            width: 40px !important;
+        }
+        
+        .ace_cursor {
+            border-left: 6px solid !important;
+        }
+        
+        .ace_hidden-cursors {
+            display: none;
+        }
+    }
+}

@@ -159,3 +159,46 @@ export function getFileExtension(filename) {
         return null;
     }
 }
+
+/**
+ * Get the ace editor language for a filename
+ * 
+ * @export
+ * @param {String} filename 
+ * @returns {String} aceeditor file type
+ */
+export function getLanguageFromFilename(filename) {
+    console.log('GETTING LANGUAGE FOR...', filename);
+    const mapExtensionToFiletype = {
+        js: 'javascript',
+        jsx: 'jsx',
+        py: 'python',
+        markdown: 'markdown',
+        md: 'markdown',
+        html: 'html',
+        rb: 'ruby',
+        java: 'java',
+        xml: 'xml',
+        css: 'css',
+        scss: 'sass',
+        sass: 'sass',
+        txt: 'text'
+    };
+    const ext = getFileExtension(filename)
+    const filetype = mapExtensionToFiletype[ext];
+    return filetype !== undefined ? filetype : 'text'
+};
+
+export function getMatchingPropertyNames(obj, criteria) {
+    const re = new RegExp(criteria);
+    return Object.keys(obj).filter(key => {
+        return re.test(key);
+    });
+};
+
+export function sharedStart(array){
+    var A= array.concat().sort(), 
+    a1= A[0], a2= A[A.length-1], L= a1.length, i= 0;
+    while(i<L && a1.charAt(i)=== a2.charAt(i)) i++;
+    return a1.substring(0, i);
+}
