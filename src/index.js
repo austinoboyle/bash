@@ -4,8 +4,9 @@ import {Provider} from 'react-redux';
 import registerServiceWorker from './registerServiceWorker';
 import store from './store';
 import App from './App';
-import {initialize, pageview} from 'react-ga'
+import {initialize, pageview, set as GASet} from 'react-ga'
 import styles from './index.scss';
+import {getCookie} from './util';
 
 const GA_ID = process.env.NODE_ENV === 'production' 
     ? 'UA-111948919-1'
@@ -14,6 +15,11 @@ const GA_ID = process.env.NODE_ENV === 'production'
 initialize(GA_ID, {
     debug: process.env.NODE_ENV !== 'production'
 })
+
+if (getCookie('ga_admin')) {
+    GASet({dimension1: 'true'});
+}
+
 pageview(window.location.pathname + window.location.search);
 
 export const app = (
