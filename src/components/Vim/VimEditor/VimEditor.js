@@ -7,6 +7,7 @@ import {getLanguageFromFilename} from '../../../util';
 import brace from 'brace';
 import AceEditor from 'react-ace';
 
+// eslint-disable-next-line
 import styles from './VimEditor.scss';
 
 import PropTypes from 'prop-types';
