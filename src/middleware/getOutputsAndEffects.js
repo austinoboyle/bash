@@ -106,10 +106,27 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
                 }
             });
             break;
+        case 'mv':
+            if (dirStrings.length < 1) {
+                outputs.push(<Error msg={`mv: missing file operand`} />);
+            } else if (dirStrings.length < 2) {
+                outputs.push(<Error msg={`mv: missing destination file operand after '${dirStrings[0]}'`} />);
+            } else {
+                dirStrings.forEach(dir => {
+                    const lastElement = path.slice(path.length - 1);
+                    const pathToLastElement = path.slice(0,path.length - 1);
+                    const fileContents = goToPath(currentDirTree, pathToLastElement.concat(lastElement));
+                    if (typeof fileContents !== 'string' && typeof fileContents !== 'object') {
+                        outputs = [];
+                        outputs.push(<Error msg='TODO' />);
+                    }
+                })
+            }
+            break;
         case 'mkdir':
             // Must have a non-flag argument
             if (dirStrings.length < 1) {
-                return <Error msg={`mkdir: missing operand`} />;                   
+                outputs.push(<Error msg={`mkdir: missing operand`} />);                   
             } else {
                 paths.forEach((path, index) => {
                     const lastElement = path.slice(path.length - 1);

@@ -85,6 +85,16 @@ export function rm(path, file) {
     };
 }
 
+export function mv(path, newPath) {
+    return {
+        type: 'MOVE',
+        payload: {
+            path,
+            newPath
+        }
+    };
+};
+
 export function execute(url) {
     return function(dispatch) {
         dispatch({
