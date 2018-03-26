@@ -1,4 +1,4 @@
-import {goToPath} from '../util';
+import {goToPath, isDirectory, isFile, isFileOrDirectory} from '../util';
 import {resume} from './content/resume';
 import {PROFILE} from '../constants';
 import _ from 'lodash';
@@ -29,6 +29,7 @@ const initialState = {
 export function terminalReducer(state=initialState, action){
     let newDirTree = _.cloneDeep(state.dirTree);
     let pointer = newDirTree;
+    let prevContents;
     switch (action.type) {
         case "SUBMIT_COMMAND": {
             // Only add non-empty commands to history
@@ -39,6 +40,18 @@ export function terminalReducer(state=initialState, action){
         }
         case "CLEAR":
             return {...state, outputs: []};
+        case 'COPY':
+            prevContents = goToPath(state.dirTree, action.payload.source);
+            _.dropRight(action.payload.dest).forEach(path => {
+                pointer = pointer[path];
+            })
+            if (isDirectory(state.dirTree, action.payload.dest)) {
+                pointer = pointer[_.last(action.payload.dest)]
+                pointer[_.last(action.payload.source)] = prevContents;
+            } else {
+                pointer[_.last(action.payload.dest)] = prevContents;
+            }            
+            return {...state, dirTree: newDirTree};
         case "NEW_OUTPUT":
             return {...state, outputs: state.outputs.concat(action.payload)};
         case 'CHANGE_DIR':
@@ -65,7 +78,7 @@ export function terminalReducer(state=initialState, action){
             action.payload.dir.forEach(path => {
                 pointer = pointer[path]
             });
-            const prevContents = _.cloneDeep(pointer[action.payload.prev]);
+            prevContents = _.cloneDeep(pointer[action.payload.prev]);
             delete pointer[action.payload.prev];
             pointer[action.payload.next] = prevContents;
             return {...state, dirTree: newDirTree};
@@ -73,13 +86,13 @@ export function terminalReducer(state=initialState, action){
             _.dropRight(action.payload.source).forEach(path => {
                 pointer = pointer[path]
             });
-            const sourceContents = _.cloneDeep(pointer[_.last(action.payload.source)]);
+            prevContents = _.cloneDeep(pointer[_.last(action.payload.source)]);
             delete pointer[_.last(action.payload.source)];
             pointer = newDirTree;
             for (let path of action.payload.dest) {
                 pointer = pointer[path]
             }
-            pointer[_.last(action.payload.source)] = sourceContents;
+            pointer[_.last(action.payload.source)] = prevContents;
             return {...state, dirTree: newDirTree};
         case 'INITIALIZE_VIM':
             return {...state, isActive: false, vim: {pathToFile: action.payload}};
