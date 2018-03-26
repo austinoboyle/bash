@@ -5541,7 +5541,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types-exact@^1.1.1:
+prop-types-exact@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prop-types-exact/-/prop-types-exact-1.1.2.tgz#0b5addd8ff3ea10823fe1d94f030f4b4296b513f"
   dependencies:
