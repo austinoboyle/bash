@@ -1,7 +1,7 @@
 import {goToPath} from '../util';
 import {resume} from './content/resume';
 import {PROFILE} from '../constants';
-
+import _ from 'lodash';
 const initialState = {
     path: PROFILE.HOME_DIR_ARR,
     isActive: true,
@@ -27,7 +27,7 @@ const initialState = {
 };
 
 export function terminalReducer(state=initialState, action){
-    let newDirTree = {...state.dirTree};
+    let newDirTree = _.cloneDeep(state.dirTree);
     let pointer = newDirTree;
     switch (action.type) {
         case "SUBMIT_COMMAND": {
@@ -56,22 +56,42 @@ export function terminalReducer(state=initialState, action){
             pointer[action.payload.newFile] = '';
             return {...state, dirTree: newDirTree};            
         case 'REMOVE':
-            console.log("REMOVE", action.payload.path, action.payload.file);
             for (let path of action.payload.path) {
                 pointer = pointer[path];
             }
             delete pointer[action.payload.file];
             return {...state, dirTree: newDirTree}
+        case 'RENAME':
+            action.payload.dir.forEach(path => {
+                pointer = pointer[path]
+            });
+            const prevContents = _.cloneDeep(pointer[action.payload.prev]);
+            delete pointer[action.payload.prev];
+            pointer[action.payload.next] = prevContents;
+            return {...state, dirTree: newDirTree};
+        case 'MOVE':
+            _.dropRight(action.payload.source).forEach(path => {
+                pointer = pointer[path]
+            });
+            const sourceContents = _.cloneDeep(pointer[_.last(action.payload.source)]);
+            delete pointer[_.last(action.payload.source)];
+            pointer = newDirTree;
+            for (let path of action.payload.dest) {
+                pointer = pointer[path]
+            }
+            pointer[_.last(action.payload.source)] = sourceContents;
+            return {...state, dirTree: newDirTree};
         case 'INITIALIZE_VIM':
             return {...state, isActive: false, vim: {pathToFile: action.payload}};
         case 'QUIT_VIM':
             return {...state, isActive: true};
         case "WRITE":
             const fullPathToFile = state.path.concat(state.vim.pathToFile);
-            const pathToContainerDir = fullPathToFile.slice(0, fullPathToFile.length - 1);
-            let containerDir = goToPath(state.dirTree, pathToContainerDir);
-            containerDir[fullPathToFile[fullPathToFile.length - 1]] = action.payload;
-            return {...state};
+            _.dropRight(fullPathToFile).forEach(path => {
+                pointer = pointer[path];
+            });
+            pointer[_.last(fullPathToFile)] = action.payload;
+            return {...state, dirTree: newDirTree};
         default: 
             return state;
     }

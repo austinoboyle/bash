@@ -32,6 +32,12 @@ import 'brace/keybinding/vim';
 export const Vim = brace.acequire('ace/keyboard/vim').CodeMirror.Vim;
 
 export class VimEditor extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            value: this.props.initialText
+        };
+    }
     getValue() {
         return this.editor.getValue();
     }
@@ -40,8 +46,12 @@ export class VimEditor extends Component {
         this.editor.setValue(value);
     }
 
+    onChange = (newValue) => {
+        this.setState({value: newValue})
+    }
+
     componentDidMount(){
-        if (!this.refs.Vim_Editor){
+        if (!this.vim){
             this.editor = {
                 setValue: () => {},
                 getValue: () => {},
@@ -49,7 +59,7 @@ export class VimEditor extends Component {
                 navigateTo: () => {}
             };
         } else {
-            this.editor = this.refs.Vim_Editor.editor;
+            this.editor = this.vim.editor;
         }
         const quit = (cm, input) => {this.props.quit()};
         const write = (cm, input) => {this.props.write(this.getValue())};
@@ -64,23 +74,21 @@ export class VimEditor extends Component {
     }
 
     render() {
+        console.log("RENDERED");
         const {filename} = {...this.props};
         return <AceEditor
             mode={getLanguageFromFilename(filename)}
             theme="monokai"
-            ref="Vim_Editor"
-            // onChange={onChange}
+            ref={(el) => {this.vim = el;}}
+            onChange={this.onChange}
             height="auto"
+            value={this.state.value}
             width="100%"
-            value={`test
-            this is a multiline
-            test function()
-            test`}
             name="vim-editor"
             keyboardHandler="vim"
-            enableLiveAutocompletion={true}
+            enableLiveAutoCompletion={true}
             setOptions={{
-                enableLiveAutocompletion: true,
+                enableLiveAutoCompletion: true,
                 cursorStyle: "wide"
             }}
         />;

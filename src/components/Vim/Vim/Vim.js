@@ -20,7 +20,6 @@ export class Vim extends Component {
     }
 
     submitCommand(command){
-        console.log('SUBMITTED COMMAND:', command);
     }
 
     render() {

@@ -1,4 +1,5 @@
 import {PROFILE} from './constants';
+import {cloneDeep} from 'lodash';
 
 export function getCookie(name) {
     var nameEQ = name + "=";
@@ -49,8 +50,6 @@ export function parseCommandText(text){
     const dirStrings = args
         .filter(arg => new RegExp('^[^-]+').test(arg))
         .map(arg => arg.replace(/(.+)\/$/, "$1"));
-    console.log('TEXT:', text);
-    console.log(command, args, kwflags,flags, dirStrings);
     return {
         command,
         args,
@@ -125,7 +124,7 @@ export function pathArrayToString(pathArr) {
  * object if the path leads to a directory.
  */
 export function goToPath(dirTree, path){
-    let dirTreeCopy = {...dirTree};
+    let dirTreeCopy = cloneDeep(dirTree);
     const parsedPath = parsePath(path);
 
     for (let dir of parsedPath) {
@@ -135,6 +134,42 @@ export function goToPath(dirTree, path){
         }
     }
     return dirTreeCopy;
+}
+
+/**
+ * Check if a path leads to a file
+ * 
+ * @export
+ * @param {Object} dirTree current directory tree 
+ * @param {Array} path array of desired path 
+ * @returns 
+ */
+export function isFile(dirTree, path) {
+    return typeof goToPath(dirTree, path) === 'string';
+}
+/**
+ * Check if a path leads to a directory 
+ * 
+ * @export
+ * @param {Object} dirTree current directory tree 
+ * @param {Array} path array of desired path 
+ * @returns 
+ */
+export function isDirectory(dirTree, path) {
+    return typeof goToPath(dirTree, path) === 'object';
+}
+
+/**
+ * Check if a path leads to a file or directory
+ * 
+ * @export
+ * @param {Object} dirTree current directory tree 
+ * @param {Array} path array of desired path 
+ * @returns 
+ */
+export function isFileOrDirectory(dirTree, path) {
+    const type = typeof goToPath(dirTree, path);
+    return type === 'string' || type === 'object';
 }
 
 /**
@@ -181,7 +216,6 @@ export function getFileExtension(filename) {
  * @returns {String} aceeditor file type
  */
 export function getLanguageFromFilename(filename) {
-    console.log('GETTING LANGUAGE FOR...', filename);
     const mapExtensionToFiletype = {
         js: 'javascript',
         jsx: 'jsx',
