@@ -13,7 +13,8 @@ class PlainText extends Component {
 
     resize(e){
         if (this.textarea !== null && this.textarea !== undefined){
-            const cols = this.textarea.cols;
+            const cols = 73;
+            console.log("COLS", cols)
             let numRows = 0;
             this.props.text.split("\n").forEach((line) => {
                 numRows += 1;
