@@ -55,6 +55,13 @@ export function cd(newDir) {
     }
 }
 
+export function copy(source, dest) {
+    return {
+        type: "COPY",
+        payload: {source, dest}
+    }
+}
+
 export function mkdir(path, newDir) {
     return {
         type: 'MAKE_DIRECTORY',

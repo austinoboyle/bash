@@ -11,7 +11,7 @@ import {
     isFile,
     isDirectory
 } from '../util';
-import {cd, mkdir, rm, touch, clear, execute, move, rename} from '../actions/terminalActions';
+import {cd, mkdir, rm, touch, clear, execute, move, rename, copy} from '../actions/terminalActions';
 import {initializeVim} from '../actions/vimActions';
 import Error from '../components/outputs/Error/Error';
 import PlainText from '../components/outputs/PlainText/PlainText';
@@ -84,6 +84,38 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
         case 'clear':
             effects.push(clear());
             break;
+        case 'cp':
+            if (dirStrings.length < 1) {
+                outputs.push(<Error msg={`cp: missing file operand`} />);
+            } else if (dirStrings.length < 2) {
+                outputs.push(<Error msg={`cp: missing destination file operand after '${dirStrings[0]}'`} />);
+            } else {
+                const sources = _.dropRight(paths);
+                const dest = _.last(paths);
+                const validSources = [];
+               
+                sources.forEach((source, i) => {
+                    if (!isFileOrDirectory(currentDirTree, source)) {
+                       outputs.push(<Error msg={`cp: '${dirStrings[0]}' and '${dirStrings[1]}' are the same file`} />)
+                    } else {
+                       validSources.push(source);
+                    }
+                })
+                if (sources.length > 1 && !isDirectory(currentDirTree, dest)) {
+                    outputs = [<Error msg={`cp: target '${_.last(dirStrings)}' is not a directory`} />]
+                } else {
+                    _.uniqWith(validSources, _.isEqual).forEach((source, i) => {
+                        if (_.isEqual(source, dest)) {
+                            outputs.push(<Error msg={`mv: '${dirStrings[i]}' and '${dirStrings[dirStrings.length - 1]}' are the same file`} />);
+                        } else if (isDirectory(currentDirTree, source) && ! flags.includes('r')) {
+                            outputs.push(<Error msg={`cp: -r flag is missing; ommiting directory '${dirStrings[i]}'`} />);
+                        } else {
+                            effects.push(copy(source, dest));
+                        }
+                    })
+                }
+            }
+            break;
         case 'echo':
             outputs.push(<PlainText text={args.join(' ')} />);
             break;
@@ -134,7 +166,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
                     // Invalid dest error overrides other errors with more than
                     // 1 source passed in
                     if (!isDirectory(currentDirTree, dest)) {
-                        outputs = [<Error msg={`mv: target '${dirStrings[dirStrings.length - 1]}': No such file or directory`} />]
+                        outputs = [<Error msg={`mv: target '${dirStrings[dirStrings.length - 1]}' is not a directory`} />]
                     } else {
                         _.uniqWith(validSources, _.isEqual).forEach((source, i) => {
                             if (_.isEqual(source, dest)) {
