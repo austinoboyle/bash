@@ -85,15 +85,23 @@ export function rm(path, file) {
     };
 }
 
-export function mv(path, newPath) {
+export function move(source, dest) {
     return {
-        type: 'MOVE',
-        payload: {
-            path,
-            newPath
-        }
-    };
+        type: "MOVE",
+        payload: {source, dest}
+    }
 };
+
+export function rename(source, dest) {
+    return {
+        type: "RENAME",
+        payload: {
+            dir: source.slice(0, source.length - 1),
+            prev: source[source.length - 1],
+            next: dest[dest.length - 1]  
+        }
+    }
+}
 
 export function execute(url) {
     return function(dispatch) {
