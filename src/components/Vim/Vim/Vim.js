@@ -19,8 +19,6 @@ export class Vim extends Component {
         };
     }
 
-    submitCommand(command){
-    }
 
     render() {
         // eslint-disable-next-line
@@ -29,7 +27,6 @@ export class Vim extends Component {
         return (
             <div className={styles.wrapper}>
                 <VimEditor 
-                    submitCommand={(e) => this.submitCommand(e)}
                     initialText={initialText}
                     filename={relativepathToFile[relativepathToFile.length - 1]} 
                 />
