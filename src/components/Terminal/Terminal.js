@@ -2,10 +2,12 @@ import React, {Component} from 'react';
 import TerminalInput from '../TerminalInput/TerminalInput';
 import {connect} from 'react-redux';
 import {submitCommand} from '../../actions/terminalActions';
-import { goToPath, pathStringToArray, arraysAreEqual, getMatchingPropertyNames, sharedStart } from '../../util';
+import { goToPath, pathStringToArray, getMatchingPropertyNames, sharedStartOfElements } from '../../util';
 import {KEYS, DIRECTIONS} from '../../constants';
 import PropTypes from 'prop-types';
 import exact from 'prop-types-exact';
+import {isEqual} from 'lodash';
+
 
 export class Terminal extends Component {
     constructor(props) {
@@ -17,7 +19,7 @@ export class Terminal extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (!arraysAreEqual(nextProps.commandHistory, this.props.commandHistory)){
+        if (!isEqual(nextProps.commandHistory, this.props.commandHistory)){
             this.setState({commandHistory: [''].concat(nextProps.commandHistory)});            
         }
     }
@@ -56,7 +58,7 @@ export class Terminal extends Component {
         if (matchingProperties.length === 0) {
             return;
         } 
-        const match = sharedStart(matchingProperties);
+        const match = sharedStartOfElements(matchingProperties);
         commandHistory[0] = commandText.replace(new RegExp(`(^|[ /])${currentWord}$`), '$1' + match);
         if (typeof currentDir[match] === 'object') {
             commandHistory[0] += '/';

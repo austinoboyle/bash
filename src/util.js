@@ -1,5 +1,5 @@
 import {PROFILE} from './constants';
-import {cloneDeep} from 'lodash';
+import * as _ from 'lodash';
 
 export function getCookie(name) {
     var nameEQ = name + "=";
@@ -12,7 +12,110 @@ export function getCookie(name) {
     return null;
 }
 
+export function getFileExtension(filename) {
+    const splitFileName = filename.split('.');
+    try {
+        return splitFileName[splitFileName.length - 1].toLowerCase();
+    } catch (e) {
+        return null;
+    }
+}
 
+/**
+ * Get the ace editor language for a filename
+ * 
+ * @export
+ * @param {String} filename 
+ * @returns {String} aceeditor file type
+ */
+export function getLanguageFromFilename(filename) {
+    const mapExtensionToFiletype = {
+        js: 'javascript',
+        jsx: 'jsx',
+        py: 'python',
+        markdown: 'markdown',
+        md: 'markdown',
+        html: 'html',
+        rb: 'ruby',
+        java: 'java',
+        xml: 'xml',
+        css: 'css',
+        scss: 'sass',
+        sass: 'sass',
+        txt: 'text'
+    };
+    const ext = getFileExtension(filename)
+    const filetype = mapExtensionToFiletype[ext];
+    return filetype !== undefined ? filetype : 'text'
+};
+
+export function getMatchingPropertyNames(obj, criteria) {
+    const re = new RegExp(criteria);
+    return Object.keys(obj).filter(key => {
+        return re.test(key);
+    });
+};
+
+/**
+ * Take a dirTree, and return the directory/file that the path parameter leads to
+ * 
+ * @export
+ * @param {Object} dirTree Entire directory structure
+ * @param {Array<String>} path unparsed array of path (will be parsed)
+ * @returns undefined if the path is invalid, String if the path leads to a file,
+ * object if the path leads to a directory.
+ */
+export function goToPath(dirTree, path){
+    return _.cloneDeep(_.get(dirTree, path, undefined));
+}
+
+/**
+ * Check if a path leads to a directory 
+ * 
+ * @export
+ * @param {Object} dirTree current directory tree 
+ * @param {Array} path array of desired path 
+ * @returns 
+ */
+export function isDirectory(dirTree, path) {
+    return typeof goToPath(dirTree, path) === 'object';
+}
+
+/**
+ * Check if a path leads to a file
+ * 
+ * @export
+ * @param {Object} dirTree current directory tree 
+ * @param {Array} path array of desired path 
+ * @returns 
+ */
+export function isFile(dirTree, path) {
+    return typeof goToPath(dirTree, path) === 'string';
+}
+
+/**
+ * Check if a path leads to a file or directory
+ * 
+ * @export
+ * @param {Object} dirTree current directory tree 
+ * @param {Array} path array of desired path 
+ * @returns 
+ */
+export function isFileOrDirectory(dirTree, path) {
+    const type = typeof goToPath(dirTree, path);
+    return type === 'string' || type === 'object';
+}
+
+/**
+ * Check if a url is relative
+ * 
+ * @export
+ * @param {String} url 
+ * @returns true if url is relative, false otherwise
+ */
+export function isRelativeURL(url) {
+    return url.indexOf('https://') === -1 && url.indexOf('http://') === -1;
+}
 
 /**
  * Parse a user's input text, return an object:
@@ -60,119 +163,6 @@ export function parseCommandText(text){
 }
 
 /**
- * Compare two arrays for strict equality (order matters)
- * 
- * @export
- * @param {any} a1 
- * @param {any} a2 
- * @returns {Boolean} true if arrays are identical, false otherwise
- */
-export function arraysAreEqual(a1, a2){
-    return a1.length === a2.length && a1.every((v,i)=> v === a2[i]);
-}
-
-/**
- * Convert a string path to a path array
- * 
- * @export
- * @param {String} pathString string path
- * @returns {Array<String>} unparsed path array
- */
-export function pathStringToArray(pathString) {
-    let pathArray = [];
-    let isAbsolutePath = false;
-    if (pathString[0] === '/'){
-        isAbsolutePath = true;
-        pathString = pathString.slice(1);
-    } else if (pathString[0] === '~') {
-        pathArray = PROFILE.HOME_DIR_ARR;
-        pathString = pathString.slice(1);
-    }
-    if (isAbsolutePath) {
-        pathArray.unshift('/');
-    }
-    
-    return pathArray.concat(pathString.split("/")).filter(dir => dir.length > 0);
-};
-
-/**
- * Stringify a path array
- * 
- * @export
- * @param {String} pathArr path array
- * @returns {Array<String>} stringified path
- */
-export function pathArrayToString(pathArr) {
-    let stringifiedPath = '';
-    if (pathArr.length < 1) {
-        return stringifiedPath;
-    } else if (pathArr[0] === '/') {
-        stringifiedPath += '/';
-        pathArr = pathArr.slice(1);
-    }
-    return stringifiedPath + pathArr.join('/');
-};
-
-
-/**
- * Take a dirTree, and return the directory/file that the path parameter leads to
- * 
- * @export
- * @param {Object} dirTree Entire directory structure
- * @param {Array<String>} path unparsed array of path (will be parsed)
- * @returns undefined if the path is invalid, String if the path leads to a file,
- * object if the path leads to a directory.
- */
-export function goToPath(dirTree, path){
-    let dirTreeCopy = cloneDeep(dirTree);
-    const parsedPath = parsePath(path);
-
-    for (let dir of parsedPath) {
-        dirTreeCopy = dirTreeCopy[dir];
-        if (dirTreeCopy === undefined) {
-            return undefined;
-        }
-    }
-    return dirTreeCopy;
-}
-
-/**
- * Check if a path leads to a file
- * 
- * @export
- * @param {Object} dirTree current directory tree 
- * @param {Array} path array of desired path 
- * @returns 
- */
-export function isFile(dirTree, path) {
-    return typeof goToPath(dirTree, path) === 'string';
-}
-/**
- * Check if a path leads to a directory 
- * 
- * @export
- * @param {Object} dirTree current directory tree 
- * @param {Array} path array of desired path 
- * @returns 
- */
-export function isDirectory(dirTree, path) {
-    return typeof goToPath(dirTree, path) === 'object';
-}
-
-/**
- * Check if a path leads to a file or directory
- * 
- * @export
- * @param {Object} dirTree current directory tree 
- * @param {Array} path array of desired path 
- * @returns 
- */
-export function isFileOrDirectory(dirTree, path) {
-    const type = typeof goToPath(dirTree, path);
-    return type === 'string' || type === 'object';
-}
-
-/**
  * Parse a relative path array and return the parsed absolute path array
  * 
  * @export
@@ -199,64 +189,52 @@ export function parsePath(pathArray) {
     }, []);
 };
 
-export function getFileExtension(filename) {
-    const splitFileName = filename.split('.');
-    try {
-        return splitFileName[splitFileName.length - 1].toLowerCase();
-    } catch (e) {
-        return null;
-    }
-}
-
 /**
- * Get the ace editor language for a filename
+ * Stringify a path array
  * 
  * @export
- * @param {String} filename 
- * @returns {String} aceeditor file type
+ * @param {String} pathArr path array
+ * @returns {Array<String>} stringified path
  */
-export function getLanguageFromFilename(filename) {
-    const mapExtensionToFiletype = {
-        js: 'javascript',
-        jsx: 'jsx',
-        py: 'python',
-        markdown: 'markdown',
-        md: 'markdown',
-        html: 'html',
-        rb: 'ruby',
-        java: 'java',
-        xml: 'xml',
-        css: 'css',
-        scss: 'sass',
-        sass: 'sass',
-        txt: 'text'
-    };
-    const ext = getFileExtension(filename)
-    const filetype = mapExtensionToFiletype[ext];
-    return filetype !== undefined ? filetype : 'text'
+export function pathArrayToString(pathArr) {
+    let stringifiedPath = '';
+    if (pathArr.length < 1) {
+        return stringifiedPath;
+    } else if (pathArr[0] === '/') {
+        stringifiedPath += '/';
+        pathArr = pathArr.slice(1);
+    }
+    return stringifiedPath + pathArr.join('/');
 };
 
-export function getMatchingPropertyNames(obj, criteria) {
-    const re = new RegExp(criteria);
-    return Object.keys(obj).filter(key => {
-        return re.test(key);
-    });
+
+/**
+ * Convert a string path to a path array
+ * 
+ * @export
+ * @param {String} pathString string path
+ * @returns {Array<String>} unparsed path array
+ */
+export function pathStringToArray(pathString) {
+    let pathArray = [];
+    let isAbsolutePath = false;
+    if (pathString[0] === '/'){
+        isAbsolutePath = true;
+        pathString = pathString.slice(1);
+    } else if (pathString[0] === '~') {
+        pathArray = PROFILE.HOME_DIR_ARR;
+        pathString = pathString.slice(1);
+    }
+    if (isAbsolutePath) {
+        pathArray.unshift('/');
+    }
+    
+    return pathArray.concat(pathString.split("/")).filter(dir => dir.length > 0);
 };
 
-export function sharedStart(array){
+export function sharedStartOfElements(array){
     var A= array.concat().sort(), 
     a1= A[0], a2= A[A.length-1], L= a1.length, i= 0;
     while(i<L && a1.charAt(i)=== a2.charAt(i)) i++;
     return a1.substring(0, i);
-}
-
-/**
- * Check if a url is relative
- * 
- * @export
- * @param {String} url 
- * @returns true if url is relative, false otherwise
- */
-export function isRelativeURL(url) {
-    return url.indexOf('https://') === -1 && url.indexOf('http://') === -1;
 }
