@@ -13,7 +13,10 @@ const initialState = {
                 austinoboyle: {
                     projects: {
                         'animated_menus.sh': '/animated-menus',
-                        'bash.sh': '/bash'
+                        'bash.sh': '/bash',
+                        'scrape_linkedin.sh': 'https://github.com/austinoboyle/scrape-linkedin-selenium',
+                        'uni_verse.sh': 'https://github.com/shaunbennett/qhacks2018-feapp',
+                        'blog.sh': '/blog'
                     },
                     'resume.md': resume
                 }

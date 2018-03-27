@@ -5,6 +5,10 @@ $dir-color: #75a4ce;
     margin-right: 10px;
 }
 
+.exec {
+    color: green;
+    font-weight: bold;
+}
 .dir{
     @extend .file;
     color: $dir-color;
