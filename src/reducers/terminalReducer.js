@@ -1,4 +1,4 @@
-import {goToPath, isDirectory, isFile, isFileOrDirectory} from '../util';
+import {goToPath, isDirectory} from '../util';
 import {resume} from './content/resume';
 import {PROFILE} from '../constants';
 import _ from 'lodash';

@@ -5,6 +5,7 @@ import registerServiceWorker from './registerServiceWorker';
 import store from './store';
 import App from './App';
 import {initialize, pageview, set as GASet} from 'react-ga'
+// eslint-disable-next-line
 import styles from './index.scss';
 import {getCookie} from './util';
 
