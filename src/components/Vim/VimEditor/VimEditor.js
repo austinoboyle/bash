@@ -5,6 +5,7 @@ import {quit, write} from '../../../actions/vimActions';
 import {getLanguageFromFilename} from '../../../util';
 
 import brace from 'brace';
+import 'brace/ext/language_tools';
 import AceEditor from 'react-ace';
 
 // eslint-disable-next-line
@@ -86,10 +87,10 @@ export class VimEditor extends Component {
             width="100%"
             name="vim-editor"
             keyboardHandler="vim"
-            enableLiveAutoCompletion={true}
             setOptions={{
-                enableLiveAutoCompletion: true,
-                cursorStyle: "wide"
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true,
+                enableSnippets: true,
             }}
         />;
     }
