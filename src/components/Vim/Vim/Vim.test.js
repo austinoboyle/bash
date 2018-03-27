@@ -10,7 +10,6 @@ const mockStore = configureMockStore([thunk]);
 describe('Vim', () => {
     let wrapper;
     let props;
-    let submitCommandSpy;
     beforeEach(() => {
         props = {
             terminalPath: ['/'],
@@ -23,7 +22,6 @@ describe('Vim', () => {
                 }
             }
         };
-        submitCommandSpy = sinon.spy(Vim.prototype, 'submitCommand');
         wrapper = shallow(<Vim {...props}/>);
     });
 
@@ -34,14 +32,8 @@ describe('Vim', () => {
     it('Correctly generates initial text for the file', () => {
         expect(wrapper.state().initialText).toBe('test');
     })
-
-    it('Calls submitCommand from VimEditor props', () => {
-        wrapper.find('Connect(VimEditor)').props().submitCommand('Test');
-        expect(submitCommandSpy.calledWith('Test')).toBe(true);
-    })
     afterEach(() => {
         wrapper.unmount();
-        submitCommandSpy.restore();
     });
 })
 
