@@ -2,6 +2,7 @@ import React from 'react';
 import store from '../store';
 import getOutputsAndEffects from '../middleware/getOutputsAndEffects';
 import OutputWrapper from '../components/outputs/OutputWrapper/OutputWrapper';
+import {isRelativeURL} from '../util';
 
 export function submitCommand(text, path, currentDirTree, user) {
     return function(dispatch) {
@@ -29,7 +30,11 @@ export function submitCommand(text, path, currentDirTree, user) {
         dispatch({
             type: 'NEW_OUTPUT',
             payload: (
-                <OutputWrapper text={text} user={user} path={path}>
+                <OutputWrapper 
+                    key={store.getState().terminal.outputs.length + 1} 
+                    text={text}
+                    user={user}
+                    path={path}>
                     {allOutputs}
                 </OutputWrapper>
             )
@@ -115,6 +120,14 @@ export function execute(url) {
         dispatch({
             type: 'EXECUTE'
         });
-        window.open('https://www.austinoboyle.com' + url, '_blank');
+        console.log("URL", url);
+        if (isRelativeURL(url)) {
+            console.log("RELATIVE")
+            window.open('https://www.austinoboyle.com' + url, '_blank');
+        }
+        else {
+            console.log("NOT RELATIVE");
+            window.open(url, '_blank');
+        }
     };
 }

@@ -249,3 +249,14 @@ export function sharedStart(array){
     while(i<L && a1.charAt(i)=== a2.charAt(i)) i++;
     return a1.substring(0, i);
 }
+
+/**
+ * Check if a url is relative
+ * 
+ * @export
+ * @param {String} url 
+ * @returns true if url is relative, false otherwise
+ */
+export function isRelativeURL(url) {
+    return url.indexOf('https://') === -1 && url.indexOf('http://') === -1;
+}
