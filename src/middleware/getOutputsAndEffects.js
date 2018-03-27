@@ -47,7 +47,6 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
     console.log("PATHS", paths)
     switch (command) {
         case '':
-            outputs.push(null);
             break;
         case 'cat':
             if (dirStrings.length < 1) {
@@ -96,7 +95,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
                
                 sources.forEach((source, i) => {
                     if (!isFileOrDirectory(currentDirTree, source)) {
-                       outputs.push(<Error msg={`cp: '${dirStrings[0]}' and '${dirStrings[1]}' are the same file`} />)
+                       outputs.push(<Error key={i} msg={`cp: '${dirStrings[0]}' and '${dirStrings[1]}' are the same file`} />)
                     } else {
                        validSources.push(source);
                     }
@@ -106,9 +105,9 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
                 } else {
                     _.uniqWith(validSources, _.isEqual).forEach((source, i) => {
                         if (_.isEqual(source, dest)) {
-                            outputs.push(<Error msg={`mv: '${dirStrings[i]}' and '${dirStrings[dirStrings.length - 1]}' are the same file`} />);
+                            outputs.push(<Error key={i} msg={`mv: '${dirStrings[i]}' and '${dirStrings[dirStrings.length - 1]}' are the same file`} />);
                         } else if (isDirectory(currentDirTree, source) && ! flags.includes('r')) {
-                            outputs.push(<Error msg={`cp: -r flag is missing; ommiting directory '${dirStrings[i]}'`} />);
+                            outputs.push(<Error key={i} msg={`cp: -r flag is missing; ommiting directory '${dirStrings[i]}'`} />);
                         } else {
                             effects.push(copy(source, dest));
                         }
@@ -117,16 +116,16 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             }
             break;
         case 'echo':
-            outputs.push(<PlainText text={args.join(' ')} />);
+            outputs.push(<PlainText key={1} text={args.join(' ')} />);
             break;
         case 'ls':
-            paths.forEach(path => {
+            paths.forEach((path, i) => {
                 if (isFile(currentDirTree, path)) {
-                    outputs.push(<PlainText text={path[path.length - 1]}/>);
+                    outputs.push(<PlainText key={i} text={path[path.length - 1]}/>);
                 } else if (isDirectory(currentDirTree, path)) {
-                    outputs.push(<LS dirForCommand={goToPath(currentDirTree, path)} />);
+                    outputs.push(<LS key={i} dirForCommand={goToPath(currentDirTree, path)} />);
                 } else {
-                    outputs.push(<Error msg={`${command}: cannot access '${'/' + path.slice(1).join('/')}': No such file or directory`}/>);
+                    outputs.push(<Error key={i} msg={`${command}: cannot access '${'/' + path.slice(1).join('/')}': No such file or directory`}/>);
                 }
             });
             break;
@@ -270,12 +269,13 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             const couldBeDirOrFile = command.includes('/') || command === '~';
             if (couldBeDirOrFile) {
                 const relativePath = pathStringToArray(command);
-                const possiblePathToFile = parsePath(path.concat(relativePath));
-                const possibleFile = goToPath(currentDirTree, possiblePathToFile);
-                const fileName = possiblePathToFile[possiblePathToFile.length - 1];
-                if (typeof possibleFile === 'string' && getFileExtension(fileName) === 'sh')  {
-                    effects.push(execute(possibleFile));
-                } else if (typeof possibleFile === 'object') {
+                const fullPath = parsePath(path.concat(relativePath));
+                const fileName = _.last(fullPath);
+                if (isFile(currentDirTree, fullPath) && getFileExtension(fileName) === 'sh')  {
+                    effects.push(execute(goToPath(currentDirTree, fullPath)));
+                } else if (isFile(currentDirTree, fullPath)) {
+                    outputs.push(<Error msg={`bash: '${fileName}' is not executable`} />);
+                } else if (isDirectory(currentDirTree, fullPath)) {
                     outputs.push(<PlainText text={`bash: ${pathArrayToString(relativePath)}: Is a directory`} />);
                 } else {
                     outputs.push(<Error msg={`bash: ${pathArrayToString(relativePath)}: No such file or directory`} />);
