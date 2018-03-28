@@ -47,18 +47,20 @@ export function submitCommand(text, path, currentDirTree, user) {
     };
 };
 
-export function clear(){
-    return {
-        type: 'CLEAR'
-    };
-}
-
 export function cd(newDir) {
     return {
         type: 'CHANGE_DIR',
         payload: newDir
     }
 }
+
+
+export function clear(){
+    return {
+        type: 'CLEAR'
+    };
+}
+
 
 export function copy(source, dest) {
     return {
@@ -67,32 +69,29 @@ export function copy(source, dest) {
     }
 }
 
+export function execute(url) {
+    return function(dispatch) {
+        dispatch({
+            type: 'EXECUTE'
+        });
+        console.log("URL", url);
+        if (isRelativeURL(url)) {
+            console.log("RELATIVE")
+            window.open('https://www.austinoboyle.com' + url, '_blank');
+        }
+        else {
+            console.log("NOT RELATIVE");
+            window.open(url, '_blank');
+        }
+    };
+}
+
 export function mkdir(path, newDir) {
     return {
         type: 'MAKE_DIRECTORY',
         payload: {
             path,
             newDir
-        }
-    };
-}
-
-export function touch(path, newFile) {
-    return {
-        type: 'TOUCH',
-        payload: {
-            path,
-            newFile
-        }
-    };
-}
-
-export function rm(path, file) {
-    return {
-        type: 'REMOVE',
-        payload: {
-            path,
-            file
         }
     };
 }
@@ -115,19 +114,22 @@ export function rename(source, dest) {
     }
 }
 
-export function execute(url) {
-    return function(dispatch) {
-        dispatch({
-            type: 'EXECUTE'
-        });
-        console.log("URL", url);
-        if (isRelativeURL(url)) {
-            console.log("RELATIVE")
-            window.open('https://www.austinoboyle.com' + url, '_blank');
+export function rm(path, file) {
+    return {
+        type: 'REMOVE',
+        payload: {
+            path,
+            file
         }
-        else {
-            console.log("NOT RELATIVE");
-            window.open(url, '_blank');
+    };
+}
+
+export function touch(path, newFile) {
+    return {
+        type: 'TOUCH',
+        payload: {
+            path,
+            newFile
         }
     };
 }
