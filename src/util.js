@@ -45,6 +45,14 @@ export function getLanguageFromFilename(filename) {
     return filetype !== undefined ? filetype : 'text'
 };
 
+/**
+ * Get property names of an object that match a regex criteria
+ * 
+ * @export
+ * @param {object} obj the searched object
+ * @param {string} criteria stringified regex criteria
+ * @returns 
+ */
 export function getMatchingPropertyNames(obj, criteria) {
     const re = new RegExp(criteria);
     return Object.keys(obj).filter(key => {
@@ -135,7 +143,8 @@ export function parseCommandText(text){
         //Must contain leading double dash
         .filter(arg => new RegExp('^-{2}[^-]').test(arg))
         // Remove leading double dash
-        .map(arg => arg.replace(/^--/, ""));
+        .map(arg => arg.replace(/^--/, ""))
+        .reduce((accum, flag) => accum.includes(flag) ? accum : accum.concat([flag]), []);
 
     const flags = args
         .filter(arg => new RegExp('^-{1}[^-]').test(arg))
