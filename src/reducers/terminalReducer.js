@@ -44,7 +44,7 @@ export function terminalReducer(state=initialState, action){
     switch (action.type) {
         
         /**
-         * @param {any} payload
+         * @param {String} payload
          * @returns state with payload apppended to commandHistory
          */
         case "SUBMIT_COMMAND": {
@@ -188,7 +188,7 @@ export function terminalReducer(state=initialState, action){
         case 'QUIT_VIM':
             return {...state, isActive: true};
 
-            
+
         /**
          * @param {String} payload contents to write to the opened file
          * @returns state with dirTree updated to include new file contents
