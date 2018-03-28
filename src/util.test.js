@@ -15,3 +15,58 @@ describe('getCookie', () => {
         expect(u.getCookie('asdf')).toBe(null);
     })
 })
+
+describe('getMatchingPropertyNames', () => {
+    const obj = {
+        test: 'asdf',
+        test2: 'asdf',
+        asdf: 'asdf'
+    };
+
+    it('works', () => {
+        expect(u.getMatchingPropertyNames(obj, '^t').length).toBe(2);
+        expect(u.getMatchingPropertyNames(obj, '^a').length).toBe(1);
+        expect(u.getMatchingPropertyNames(obj, '1').length).toBe(0);
+    });
+})
+
+describe('goToPath', () => {
+    const dirTree = {
+        '/': {
+            'home': {
+                'test.txt': 'test',
+                'test.md': 'test'
+            }
+        }
+    };
+    it('Returns undefined for unknown path', () => {
+        expect(u.goToPath(dirTree, ['/', 'asdf'])).toBe(undefined);
+    });
+
+    it('returns deep copy of tree for valid path', () => {
+        expect(u.goToPath(dirTree, ['/'])).toEqual(dirTree['/']);
+        expect(u.goToPath(dirTree, ['']) === dirTree['/']).toBe(false);
+    });
+});
+
+// describe('File and Directory Checking', () => {
+//     const dirTree = {
+//         '/': {
+//             'home': {
+//                 'test.txt': 'test',
+//                 'test.md': 'test'
+//             }
+//         }
+//     };
+//     it('isDirectory Works', () => {
+//         expect(u.is())
+//     })
+
+//     it('isFile works', () => {
+
+//     })
+
+//     it('isDirectoryOrFile Works', () => {
+
+//     })
+// });
