@@ -15,3 +15,12 @@ describe('getCookie', () => {
         expect(u.getCookie('asdf')).toBe(null);
     })
 })
+
+describe('getLanguageFromFilename', () => {
+    it('returns "text" for unknown filetypes', () => {
+        expect(u.getLanguageFromFilename('test.asdf')).toBe('text');
+    })
+    it ('returns "javascript" for .js extensions', () => {
+        expect(u.getLanguageFromFilename('test.test.js')).toBe('javascript');
+    })
+})

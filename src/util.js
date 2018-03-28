@@ -13,7 +13,7 @@ export function getCookie(name) {
 }
 
 export function getFileExtension(filename) {
-    const splitFileName = filename.split('.', 2);
+    const splitFileName = filename.split('.');
     return splitFileName[splitFileName.length - 1].toLowerCase();
 }
 
