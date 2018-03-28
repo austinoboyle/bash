@@ -20,8 +20,11 @@ describe('getLanguageFromFilename', () => {
     it('returns "text" for unknown filetypes', () => {
         expect(u.getLanguageFromFilename('test.asdf')).toBe('text');
     })
-    it ('returns "javascript" for .js extensions', () => {
+    it('returns "javascript" for .js extensions', () => {
         expect(u.getLanguageFromFilename('test.test.js')).toBe('javascript');
+    })
+});
+
 describe('getMatchingPropertyNames', () => {
     const obj = {
         test: 'asdf',
