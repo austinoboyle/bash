@@ -45,6 +45,14 @@ export function getLanguageFromFilename(filename) {
     return filetype !== undefined ? filetype : 'text'
 };
 
+/**
+ * Get property names of an object that match a regex criteria
+ * 
+ * @export
+ * @param {object} obj the searched object
+ * @param {string} criteria stringified regex criteria
+ * @returns 
+ */
 export function getMatchingPropertyNames(obj, criteria) {
     const re = new RegExp(criteria);
     return Object.keys(obj).filter(key => {
