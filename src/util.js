@@ -143,7 +143,8 @@ export function parseCommandText(text){
         //Must contain leading double dash
         .filter(arg => new RegExp('^-{2}[^-]').test(arg))
         // Remove leading double dash
-        .map(arg => arg.replace(/^--/, ""));
+        .map(arg => arg.replace(/^--/, ""))
+        .reduce((accum, flag) => accum.includes(flag) ? accum : accum.concat([flag]), []);
 
     const flags = args
         .filter(arg => new RegExp('^-{1}[^-]').test(arg))
