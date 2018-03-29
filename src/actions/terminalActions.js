@@ -74,13 +74,10 @@ export function execute(url) {
         dispatch({
             type: 'EXECUTE'
         });
-        console.log("URL", url);
         if (isRelativeURL(url)) {
-            console.log("RELATIVE")
             window.open('https://www.austinoboyle.com' + url, '_blank');
         }
         else {
-            console.log("NOT RELATIVE");
             window.open(url, '_blank');
         }
     };

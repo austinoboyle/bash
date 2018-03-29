@@ -44,7 +44,6 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
 
     let outputs = [];
     let effects = [];
-    console.log("PATHS", paths)
     switch (command) {
         case '':
             break;

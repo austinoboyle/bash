@@ -75,7 +75,6 @@ export class VimEditor extends Component {
     }
 
     render() {
-        console.log("RENDERED");
         const {filename} = {...this.props};
         return <AceEditor
             mode={getLanguageFromFilename(filename)}

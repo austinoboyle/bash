@@ -1,5 +1,4 @@
 export function changeMode() {
-    console.log("MODE CHANGE");
     return {
         type: 'CHANGE_MODE'
     };
