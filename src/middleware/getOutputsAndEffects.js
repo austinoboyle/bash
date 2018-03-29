@@ -183,12 +183,10 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
                 outputs.push(<Error msg={`mkdir: missing operand`} />);                   
             } else {
                 paths.forEach((path, index) => {
-                    const lastElement = path.slice(path.length - 1);
+                    const lastElement = path[path.length - 1];
                     const pathToLastElement = path.slice(0,path.length - 1);
-                    const dirForCommand = goToPath(currentDirTree, pathToLastElement);
-                    if (typeof dirForCommand === 'object') {
+                    if (isDirectory(currentDirTree, pathToLastElement)) {
                         effects.push(mkdir(pathToLastElement, lastElement));
-                        outputs.push(null);
                     } else {
                         outputs.push(<Error msg={`mkdir: cannot create directory ${dirStrings[index] || path.join('/')}: No such file or directory`} />);
                     }
