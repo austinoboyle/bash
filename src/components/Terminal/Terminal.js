@@ -6,7 +6,7 @@ import { goToPath, pathStringToArray, getMatchingPropertyNames, sharedStartOfEle
 import {KEYS, DIRECTIONS} from '../../constants';
 import PropTypes from 'prop-types';
 import exact from 'prop-types-exact';
-import {isEqual} from 'lodash';
+import {isEqual, dropRight, last} from 'lodash';
 
 
 export class Terminal extends Component {
@@ -48,13 +48,16 @@ export class Terminal extends Component {
         let currentWord = commandText.replace(/.*\s+([^\s]+)$/, '$1');
         let dirsInCurrentCommand = pathStringToArray(currentWord);
         if (currentWord[currentWord.length - 1] === '/'){
-            dirsInCurrentCommand.push('');          
+            dirsInCurrentCommand.push('');
         }
-        currentWord = dirsInCurrentCommand[dirsInCurrentCommand.length - 1];
-        dirsInCurrentCommand = dirsInCurrentCommand.slice(0, dirsInCurrentCommand.length - 1);
+        currentWord = last(dirsInCurrentCommand);
+        dirsInCurrentCommand = dropRight(dirsInCurrentCommand);
         const currentDir = goToPath(dirTree, path.concat(dirsInCurrentCommand));
-
-        const matchingProperties = getMatchingPropertyNames(currentDir, '^' + currentWord);
+        let regexMatchString = '^' + currentWord;
+        if (currentWord === ''){
+            regexMatchString = '^.'
+        }
+        const matchingProperties = getMatchingPropertyNames(currentDir, regexMatchString);
         if (matchingProperties.length === 0) {
             return;
         } 
