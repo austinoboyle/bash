@@ -19,32 +19,44 @@ const defaultEvent = {
 };
 
 describe('Basic Functionality', () => {
-    // let wrapper;
-    // let props;
-    // beforeEach(() => {
-    //     props = {
-    //         path: ['/'],
-    //         user: 'austinoboyle',
-    //         dirTree: PropTypes.object.isRequired,
-    //         outputs: PropTypes.array.isRequired,
-    //         commandHistory: PropTypes.arrayOf(PropTypes.string),
-    //         submitCommand: PropTypes.func.isRequired,
-    //     }
-    //     wrapper = shallow(<Terminal {...props}/>);
-    // });
-    // it('Renders without crashing', () => {
-    //     expect(wrapper.length).toBe(1);
-    //     expect(wrapper.text()).toBe(props.msg);
-    // });
-    // afterEach(() => {
-    //     wrapper.unmount();
-    // });
-});
+    const props = {
+        commandHistory: [],
+        outputs: []
+    };
+    const wrapper = shallow(<Terminal {...props} />);
+    it('conditionally renders commandHistory div', () => {
+        expect(wrapper.find('.commandHistory').length).toBe(0);
+        wrapper.setProps({outputs: ['test']});
+        expect(wrapper.find('.commandHistory').length).toBe(1);
+    })
+})
+
+describe('Lifecycle Methods', () => {
+    let wrapper;
+    const props = {
+        commandHistory: [],
+        outputs: []
+    };
+    let cwrpSpy;
+    beforeEach(() => {
+        cwrpSpy = sinon.spy(Terminal.prototype, 'componentWillReceiveProps');
+        wrapper = shallow(<Terminal {...props} />);
+    })
+    it('ComponentWillReceiveProps updates commandHistory in state', () => {
+        expect(wrapper.state().commandHistory.length).toBe(1);
+        wrapper.setProps({commandHistory: ['test']})
+        expect(wrapper.state().commandHistory.length).toBe(2);
+        expect(cwrpSpy.callCount).toBe(1);
+    })
+    afterEach(() => {
+        cwrpSpy.restore();
+        wrapper.unmount();
+    })
+})
 
 describe('Event Handlers on TerminalInput', () => {
-    let wrapper;
-    let props;
-    let spy;
+    let wrapper, props;
+    let keyDownSpy, timeTravelSpy, autoCompleteSpy, submitSpy, changeSpy;
     beforeEach(() => {
         props = {
             path: ['/'],
@@ -52,6 +64,8 @@ describe('Event Handlers on TerminalInput', () => {
             dirTree: {
                 '/': {
                     'home': {
+                        'austinoboyle': {},
+                        'austin.txt': ''
                     },
                     'test.txt': 'test',
                     'test.md': '' 
@@ -65,49 +79,94 @@ describe('Event Handlers on TerminalInput', () => {
     describe('handleChange', () => {
         beforeEach(() => {
             wrapper = shallow(<Terminal {...props}/>);
-            spy = sinon.spy(Terminal.prototype, 'handleChange');
+            changeSpy = sinon.spy(Terminal.prototype, 'handleChange');
         });
         it('Changes state properly', () => {
             const e = {...defaultEvent};
             const prevHistory = wrapper.state().commandHistory;
             wrapper.find('TerminalInput').props().handleChange(e);
             expect(wrapper.state().commandHistory).toEqual([e.target.value].concat(prevHistory.slice(1)));
-            expect(spy.calledOnce).toBe(true);
+            expect(changeSpy.calledOnce).toBe(true);
         })
         afterEach(() => {
             wrapper.unmount();
-            spy.restore();
+            changeSpy.restore();
+        })
+    })
+
+    describe('handleAutoComplete', () => {
+        beforeEach(() => {
+            wrapper = shallow(<Terminal {...props} />);
+            autoCompleteSpy = sinon.spy(Terminal.prototype, 'handleAutoComplete');
+        })
+
+        it('handles trailing slash', () => {
+            const e = {...defaultEvent, target: {value: 'home/'}};
+            wrapper.instance().handleAutoComplete(e);
+            expect(wrapper.state().commandHistory[0] === 'home/austin')
+        })
+        it('handles regular match', () => {
+            const e = {...defaultEvent, target: {value: 'home/austin.t'}};
+            wrapper.instance().handleAutoComplete(e);
+            expect(wrapper.state().commandHistory[0]).toBe('home/austin.txt')
+        })
+        it('appends slash for matched directory', () => {
+            const e = {...defaultEvent, target: {value: 'home'}};
+            wrapper.instance().handleAutoComplete(e);
+            expect(wrapper.state().commandHistory[0]).toBe('home/')
+        })
+        it('handles no match', () => {
+            const e = {...defaultEvent, target: {value: 'asdf'}};
+            wrapper.instance().handleAutoComplete(e);
+            expect(wrapper.state().commandHistory[0]).toBe('')
+        })
+
+        afterEach(() => {
+            wrapper.unmount();
+            autoCompleteSpy.restore();
         })
     })
 
     describe('handleKeyDown', () => {
+
         beforeEach(() => {
             wrapper = shallow(<Terminal {...props}/>);
-            spy = sinon.spy(Terminal.prototype, 'handleKeyDown');
+            keyDownSpy = sinon.spy(Terminal.prototype, 'handleKeyDown');
+            timeTravelSpy = sinon.spy(Terminal.prototype, 'handleTimeTravel');
+            autoCompleteSpy = sinon.spy(Terminal.prototype, 'handleAutoComplete');
+            submitSpy = sinon.spy(Terminal.prototype, 'handleSubmit');
         });
         it('ENTER', () => {
             const e = {...defaultEvent, keyCode: KEYS.ENTER};
             wrapper.find('TerminalInput').props().handleKeyDown(e);
-            const submittedCommand = e.target.value;
-            const {path, dirTree, user} = {...props};
-            expect(props.submitCommand).toHaveBeenCalledWith(submittedCommand, path, dirTree, user);
+            expect(submitSpy.callCount).toBe(1);
         });
         it('TAB', () => {
             const e = {...defaultEvent, keyCode: KEYS.TAB, target: { value: 'cat te'}};
             wrapper.find('TerminalInput').props().handleKeyDown(e);
+            expect(autoCompleteSpy.callCount).toBe(1);
         });
         it('UPARROW', () => {
-            
+            const e = {...defaultEvent, keyCode: KEYS.UPARROW};
+            wrapper.find('TerminalInput').props().handleKeyDown(e);
+            expect(timeTravelSpy.callCount).toBe(1);
         });
         it('DOWNARROW', () => {
-            
+            const e = {...defaultEvent, keyCode: KEYS.DOWNARROW};
+            wrapper.find('TerminalInput').props().handleKeyDown(e);
+            expect(timeTravelSpy.callCount).toBe(1);
         });
         it('DEFAULT', () => {
-            
+            const e = {...defaultEvent, keyCode: 12345};
+            wrapper.find('TerminalInput').props().handleKeyDown(e);
+            expect(timeTravelSpy.callCount).toBe(0);
         })
         afterEach(() => {
+            keyDownSpy.restore();
+            timeTravelSpy.restore();
+            autoCompleteSpy.restore();
+            submitSpy.restore();
             wrapper.unmount();
-            spy.restore();
         })
     })
 })
