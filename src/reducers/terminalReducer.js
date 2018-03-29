@@ -179,7 +179,11 @@ export function terminalReducer(state=initialState, action){
          * @returns state with isActive false and vim's pathToFile updated
          */
         case 'INITIALIZE_VIM':
-            return {...state, isActive: false, vim: {pathToFile: action.payload}};
+            return {
+                ...state,
+                isActive: false,
+                vim: {pathToFile: action.payload}
+            };
 
         
         /**
