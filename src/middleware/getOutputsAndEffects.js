@@ -94,7 +94,6 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                 effects.push(cd(PROFILE.HOME_DIR_ARR));
             } else {
                 const fullPath = paths[0];
-                console.log('FULLPATH', fullPath);
                 if (isFile(currentDirTree, fullPath)) {
                     outputs.push(
                         <Error
@@ -407,15 +406,16 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                             msg={`vim: can't handle non-existent dirs right now`}
                         />
                     );
+                }
                 // Valid Path
-                if(isFile(currentDirTree, fullPath)){
+                if (isFile(currentDirTree, fullPath)) {
                     effects.push(initializeVim(relativePath));
-                // PATH LEADS TO A DIR, NOT A FILE
+                    // PATH LEADS TO A DIR, NOT A FILE
                 } else if (isDirectory(currentDirTree, fullPath)) {
                     outputs.push(
                         <Error msg={`vim: can't handle dirs right now`} />
                     );
-                // File doesn't exist yet
+                    // File doesn't exist yet
                 } else {
                     outputs.push(
                         <Error
