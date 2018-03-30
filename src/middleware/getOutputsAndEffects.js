@@ -406,9 +406,8 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                             msg={`vim: can't handle non-existent dirs right now`}
                         />
                     );
-                }
-                // Valid Path
-                if (isFile(currentDirTree, fullPath)) {
+                } else if (isFile(currentDirTree, fullPath)) {
+                    // Valid Path
                     effects.push(initializeVim(relativePath));
                     // PATH LEADS TO A DIR, NOT A FILE
                 } else if (isDirectory(currentDirTree, fullPath)) {
