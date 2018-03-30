@@ -311,7 +311,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                         outputs.push(
                             <Error
                                 msg={`mkdir: cannot create directory ${
-                                    dirStrings[i]
+                                    dirStrings[index]
                                 }: File exists`}
                             />
                         );
