@@ -397,34 +397,31 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                     />
                 );
             } else {
-                let pathToFile = pathStringToArray(dirStrings[0]);
-                const fullPath = path.concat(pathToFile);
+                const relativePath = pathStringToArray(dirStrings[0]);
+                const fullPath = paths[0];
                 const pathToContainerDir = _.dropRight(fullPath);
-                const containerDir = goToPath(
-                    currentDirTree,
-                    pathToContainerDir
-                );
-                const file = goToPath(currentDirTree, fullPath);
                 // PATH TO FILE CANT BE MADE
-                if (containerDir === undefined) {
+                if (!isFileOrDirectory(currentDirTree, pathToContainerDir)) {
                     outputs.push(
                         <Error
                             msg={`vim: can't handle non-existent dirs right now`}
                         />
                     );
-                    // PATH LEADS TO A DIR, NOT A FILE
-                } else if (typeof file === 'object') {
+                // Valid Path
+                if(isFile(currentDirTree, fullPath)){
+                    effects.push(initializeVim(relativePath));
+                // PATH LEADS TO A DIR, NOT A FILE
+                } else if (isDirectory(currentDirTree, fullPath)) {
                     outputs.push(
                         <Error msg={`vim: can't handle dirs right now`} />
                     );
-                } else if (typeof file === 'undefined') {
+                // File doesn't exist yet
+                } else {
                     outputs.push(
                         <Error
                             msg={`vim: can't handle undefined files right now`}
                         />
                     );
-                } else {
-                    effects.push(initializeVim(pathToFile));
                 }
             }
             break;
