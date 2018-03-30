@@ -1,13 +1,17 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import TerminalInput from '../TerminalInput/TerminalInput';
-import {connect} from 'react-redux';
-import {submitCommand} from '../../actions/terminalActions';
-import { goToPath, pathStringToArray, getMatchingPropertyNames, sharedStartOfElements } from '../../util';
-import {KEYS, DIRECTIONS} from '../../constants';
+import { connect } from 'react-redux';
+import { submitCommand } from '../../actions/terminalActions';
+import {
+    goToPath,
+    pathStringToArray,
+    getMatchingPropertyNames,
+    sharedStartOfElements
+} from '../../util';
+import { KEYS, DIRECTIONS } from '../../constants';
 import PropTypes from 'prop-types';
 import exact from 'prop-types-exact';
-import {isEqual, dropRight, last} from 'lodash';
-
+import { isEqual, dropRight, last } from 'lodash';
 
 export class Terminal extends Component {
     constructor(props) {
@@ -19,50 +23,58 @@ export class Terminal extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (!isEqual(nextProps.commandHistory, this.props.commandHistory)){
-            this.setState({commandHistory: [''].concat(nextProps.commandHistory)});            
+        if (!isEqual(nextProps.commandHistory, this.props.commandHistory)) {
+            this.setState({
+                commandHistory: [''].concat(nextProps.commandHistory)
+            });
         }
     }
 
     handleTimeTravel(e, direction) {
         e.preventDefault();
-        let {historyIndex, commandHistory} = {...this.state};
-        if(direction === DIRECTIONS.FORWARD) {
-            historyIndex -= 1
+        let { historyIndex, commandHistory } = { ...this.state };
+        if (direction === DIRECTIONS.FORWARD) {
+            historyIndex -= 1;
         } else {
             historyIndex += 1;
         }
         if (historyIndex >= 0 && historyIndex < commandHistory.length) {
             this.setState({
-                historyIndex: historyIndex,
+                historyIndex: historyIndex
             });
         }
     }
 
-    handleAutoComplete(e){
+    handleAutoComplete(e) {
         e.preventDefault(); //prevent tab from moving you around screen
         const commandText = e.target.value.trim();
-        const {path, dirTree} = {...this.props};
-        let {commandHistory} = {...this.state};
+        const { path, dirTree } = { ...this.props };
+        let { commandHistory } = { ...this.state };
 
         let currentWord = commandText.replace(/.*\s+([^\s]+)$/, '$1');
         let dirsInCurrentCommand = pathStringToArray(currentWord);
-        if (currentWord[currentWord.length - 1] === '/'){
+        if (currentWord[currentWord.length - 1] === '/') {
             dirsInCurrentCommand.push('');
         }
         currentWord = last(dirsInCurrentCommand);
         dirsInCurrentCommand = dropRight(dirsInCurrentCommand);
         const currentDir = goToPath(dirTree, path.concat(dirsInCurrentCommand));
         let regexMatchString = '^' + currentWord;
-        if (currentWord === ''){
-            regexMatchString = '^.'
+        if (currentWord === '') {
+            regexMatchString = '^.';
         }
-        const matchingProperties = getMatchingPropertyNames(currentDir, regexMatchString);
+        const matchingProperties = getMatchingPropertyNames(
+            currentDir,
+            regexMatchString
+        );
         if (matchingProperties.length === 0) {
             return;
-        } 
+        }
         const match = sharedStartOfElements(matchingProperties);
-        commandHistory[0] = commandText.replace(new RegExp(`(^|[ /])${currentWord}$`), '$1' + match);
+        commandHistory[0] = commandText.replace(
+            new RegExp(`(^|[ /])${currentWord}$`),
+            '$1' + match
+        );
         if (typeof currentDir[match] === 'object') {
             commandHistory[0] += '/';
         }
@@ -76,7 +88,7 @@ export class Terminal extends Component {
     handleSubmit(e) {
         e.preventDefault();
         const submittedCommand = e.target.value;
-        const {path, dirTree, user} = {...this.props};
+        const { path, dirTree, user } = { ...this.props };
         this.props.submitCommand(submittedCommand, path, dirTree, user);
         this.setState({
             historyIndex: 0
@@ -84,7 +96,7 @@ export class Terminal extends Component {
     }
 
     handleKeyDown(e) {
-        switch(e.keyCode) {
+        switch (e.keyCode) {
             case KEYS.ENTER:
                 this.handleSubmit(e);
                 return;
@@ -103,7 +115,7 @@ export class Terminal extends Component {
     }
 
     handleChange(e) {
-        let {commandHistory, historyIndex} = {...this.state};
+        let { commandHistory, historyIndex } = { ...this.state };
         commandHistory[historyIndex] = e.target.value;
         this.setState({
             commandHistory: commandHistory
@@ -111,19 +123,21 @@ export class Terminal extends Component {
     }
 
     render() {
-        const {path, user, outputs} = this.props;
-        const {commandHistory, historyIndex} = this.state;
+        const { path, user, outputs } = this.props;
+        const { commandHistory, historyIndex } = this.state;
         return (
-            <div className = "terminal" >
-                {outputs.length > 0  && <div className="commandHistory">{outputs}</div>}
+            <div className="terminal">
+                {outputs.length > 0 && (
+                    <div className="commandHistory">{outputs}</div>
+                )}
 
-                <TerminalInput 
-                    handleChange={(e) => this.handleChange(e)}
-                    handleKeyDown={(e) => this.handleKeyDown(e)}
+                <TerminalInput
+                    handleChange={e => this.handleChange(e)}
+                    handleKeyDown={e => this.handleKeyDown(e)}
                     path={path}
                     user={user}
                     isReadOnly={false}
-                    value={commandHistory[historyIndex]}  
+                    value={commandHistory[historyIndex]}
                 />
             </div>
         );
@@ -136,8 +150,8 @@ Terminal.propTypes = exact({
     dirTree: PropTypes.object.isRequired,
     outputs: PropTypes.array.isRequired,
     commandHistory: PropTypes.arrayOf(PropTypes.string),
-    submitCommand: PropTypes.func.isRequired,
-})
+    submitCommand: PropTypes.func.isRequired
+});
 
 function mapStateToProps(state) {
     return {
