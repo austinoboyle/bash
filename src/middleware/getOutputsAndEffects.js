@@ -1,7 +1,7 @@
 import React from 'react';
 import * as _ from 'lodash';
 import {
-    parseCommandText, 
+    parseCommandText,
     goToPath,
     parsePath,
     pathStringToArray,
@@ -11,16 +11,26 @@ import {
     isFile,
     isDirectory
 } from '../util';
-import {cd, mkdir, rm, touch, clear, execute, move, rename, copy} from '../actions/terminalActions';
-import {initializeVim} from '../actions/vimActions';
+import {
+    cd,
+    mkdir,
+    rm,
+    touch,
+    clear,
+    execute,
+    move,
+    rename,
+    copy
+} from '../actions/terminalActions';
+import { initializeVim } from '../actions/vimActions';
 import Error from '../components/outputs/Error/Error';
 import PlainText from '../components/outputs/PlainText/PlainText';
 import LS from '../components/outputs/LS/LS';
-import {PROFILE} from '../constants';
+import { PROFILE } from '../constants';
 
 /**
  * Get the outputs and effects that a command should invoke
- * 
+ *
  * @export
  * @param {String} text user input to be parsed
  * @param {Array<String>} path current path in the terminal
@@ -29,54 +39,79 @@ import {PROFILE} from '../constants';
  * @returns {Object} {outputs, effects}:
  * - outputs {Array<JSX>}: array of child components of an OutputWrapper for the command
  * - effects {Array<Object>} array of actions to be dispatched
- * 
+ *
  */
-export default function getOutputsAndEffects(text, path, currentDirTree, user){
+export default function getOutputsAndEffects(text, path, currentDirTree, user) {
     // eslint-disable-next-line
-    let {command, kwflags, flags, dirStrings, args} = parseCommandText(text);
+    let { command, kwflags, flags, dirStrings, args } = parseCommandText(text);
     currentDirTree = JSON.parse(JSON.stringify(currentDirTree));
     let paths = [path];
     if (dirStrings.length > 0) {
         paths = dirStrings.map(dirString => {
-            return path.concat(parsePath(pathStringToArray(dirString)));
+            return parsePath(path.concat(pathStringToArray(dirString)));
         });
     }
 
     let outputs = [];
     let effects = [];
-    console.log("PATHS", paths)
     switch (command) {
         case '':
             break;
         case 'cat':
             if (dirStrings.length < 1) {
-                outputs.push(<Error msg={`cat: missing operand`} />);                   
+                outputs.push(<Error msg={`cat: missing operand`} />);
             } else {
                 paths.forEach((path, index) => {
                     if (isFile(currentDirTree, path)) {
-                        outputs.push(<PlainText text={goToPath(currentDirTree, path)} />)
+                        outputs.push(
+                            <PlainText text={goToPath(currentDirTree, path)} />
+                        );
                     } else if (isDirectory(currentDirTree, path)) {
-                        outputs.push(<Error msg={`cat: '${dirStrings[index] || path.join('/')}': Is a directory`} />);
+                        outputs.push(
+                            <Error
+                                msg={`cat: '${dirStrings[index] ||
+                                    path.join('/')}': Is a directory`}
+                            />
+                        );
                     } else {
-                        outputs.push(<Error msg={`cat: '${dirStrings[index] || path.join('/')}': No such file or directory`} />);
+                        outputs.push(
+                            <Error
+                                msg={`cat: '${dirStrings[index] ||
+                                    path.join(
+                                        '/'
+                                    )}': No such file or directory`}
+                            />
+                        );
                     }
                 });
             }
             break;
-        
+
         case 'cd':
             if (paths.length > 1) {
-                outputs.push(<Error msg={`${command}: too many arguments.`}/>);
+                outputs.push(<Error msg={`${command}: too many arguments.`} />);
             } else if (dirStrings.length === 0) {
                 effects.push(cd(PROFILE.HOME_DIR_ARR));
             } else {
                 const fullPath = paths[0];
                 if (isFile(currentDirTree, fullPath)) {
-                    outputs.push(<Error msg={`bash: cd: ${fullPath[fullPath.length - 1]}: Not a directory.`}/>);
+                    outputs.push(
+                        <Error
+                            msg={`bash: cd: ${
+                                fullPath[fullPath.length - 1]
+                            }: Not a directory.`}
+                        />
+                    );
                 } else if (isDirectory(currentDirTree, fullPath)) {
-                    effects.push(cd(parsePath(paths[0])));
+                    effects.push(cd(parsePath(fullPath)));
                 } else {
-                    outputs.push(<Error msg={`bash: cd: ${dirStrings[0]}: no such file or directory.`}/>);
+                    outputs.push(
+                        <Error
+                            msg={`bash: cd: ${
+                                dirStrings[0]
+                            }: no such file or directory.`}
+                        />
+                    );
                 }
             }
             break;
@@ -87,31 +122,67 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             if (dirStrings.length < 1) {
                 outputs.push(<Error msg={`cp: missing file operand`} />);
             } else if (dirStrings.length < 2) {
-                outputs.push(<Error msg={`cp: missing destination file operand after '${dirStrings[0]}'`} />);
+                outputs.push(
+                    <Error
+                        msg={`cp: missing destination file operand after '${
+                            dirStrings[0]
+                        }'`}
+                    />
+                );
             } else {
                 const sources = _.dropRight(paths);
                 const dest = _.last(paths);
                 const validSources = [];
-               
+
                 sources.forEach((source, i) => {
                     if (!isFileOrDirectory(currentDirTree, source)) {
-                       outputs.push(<Error key={i} msg={`cp: '${dirStrings[0]}' and '${dirStrings[1]}' are the same file`} />)
+                        outputs.push(
+                            <Error
+                                key={i}
+                                msg={`cp: '${dirStrings[0]}' and '${
+                                    dirStrings[1]
+                                }' are the same file`}
+                            />
+                        );
                     } else {
-                       validSources.push(source);
+                        validSources.push(source);
                     }
-                })
+                });
                 if (sources.length > 1 && !isDirectory(currentDirTree, dest)) {
-                    outputs = [<Error msg={`cp: target '${_.last(dirStrings)}' is not a directory`} />]
+                    outputs = [
+                        <Error
+                            msg={`cp: target '${_.last(
+                                dirStrings
+                            )}' is not a directory`}
+                        />
+                    ];
                 } else {
                     _.uniqWith(validSources, _.isEqual).forEach((source, i) => {
                         if (_.isEqual(source, dest)) {
-                            outputs.push(<Error key={i} msg={`mv: '${dirStrings[i]}' and '${dirStrings[dirStrings.length - 1]}' are the same file`} />);
-                        } else if (isDirectory(currentDirTree, source) && ! flags.includes('r')) {
-                            outputs.push(<Error key={i} msg={`cp: -r flag is missing; ommiting directory '${dirStrings[i]}'`} />);
+                            outputs.push(
+                                <Error
+                                    key={i}
+                                    msg={`mv: '${dirStrings[i]}' and '${
+                                        dirStrings[dirStrings.length - 1]
+                                    }' are the same file`}
+                                />
+                            );
+                        } else if (
+                            isDirectory(currentDirTree, source) &&
+                            !flags.includes('r')
+                        ) {
+                            outputs.push(
+                                <Error
+                                    key={i}
+                                    msg={`cp: -r flag is missing; ommiting directory '${
+                                        dirStrings[i]
+                                    }'`}
+                                />
+                            );
                         } else {
                             effects.push(copy(source, dest));
                         }
-                    })
+                    });
                 }
             }
             break;
@@ -121,11 +192,25 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
         case 'ls':
             paths.forEach((path, i) => {
                 if (isFile(currentDirTree, path)) {
-                    outputs.push(<PlainText key={i} text={path[path.length - 1]}/>);
+                    outputs.push(
+                        <PlainText key={i} text={path[path.length - 1]} />
+                    );
                 } else if (isDirectory(currentDirTree, path)) {
-                    outputs.push(<LS key={i} dirForCommand={goToPath(currentDirTree, path)} />);
+                    outputs.push(
+                        <LS
+                            key={i}
+                            dirForCommand={goToPath(currentDirTree, path)}
+                        />
+                    );
                 } else {
-                    outputs.push(<Error key={i} msg={`${command}: cannot access '${'/' + path.slice(1).join('/')}': No such file or directory`}/>);
+                    outputs.push(
+                        <Error
+                            key={i}
+                            msg={`${command}: cannot access '${
+                                dirStrings[i]
+                            }': No such file or directory`}
+                        />
+                    );
                 }
             });
             break;
@@ -134,7 +219,13 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
             if (dirStrings.length < 1) {
                 outputs.push(<Error msg={`mv: missing file operand`} />);
             } else if (dirStrings.length < 2) {
-                outputs.push(<Error msg={`mv: missing destination file operand after '${dirStrings[0]}'`} />);
+                outputs.push(
+                    <Error
+                        msg={`mv: missing destination file operand after '${
+                            dirStrings[0]
+                        }'`}
+                    />
+                );
             } else {
                 // Get sources, destination, and valid sources
                 const sources = paths.slice(0, paths.length - 1);
@@ -142,37 +233,68 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
                 const dest = paths[paths.length - 1];
                 sources.forEach((source, i) => {
                     if (!isFileOrDirectory(currentDirTree, source)) {
-                        outputs.push(<Error msg={`mv: cannot stat '${dirStrings[i]}': no such file or directory`} />);
+                        outputs.push(
+                            <Error
+                                msg={`mv: cannot stat '${
+                                    dirStrings[i]
+                                }': no such file or directory`}
+                            />
+                        );
                     } else {
                         validSources.push(source);
                     }
-                })
+                });
                 if (validSources.length > 0 && sources.length === 1) {
                     const parsedSource = parsePath(validSources[0]);
                     // If only 1 source and dest is directory, move source there
                     // TODO - If file already exists with that path
                     if (_.isEqual(parsedSource, parsePath(dest))) {
-                        outputs.push(<Error msg={`mv: '${dirStrings[0]}' and '${dirStrings[1]}' are the same file`} />);
+                        outputs.push(
+                            <Error
+                                msg={`mv: '${dirStrings[0]}' and '${
+                                    dirStrings[1]
+                                }' are the same file`}
+                            />
+                        );
                     } else if (isDirectory(currentDirTree, dest)) {
                         effects.push(move(parsedSource, dest));
-                    } else if (isDirectory(currentDirTree, dest.slice(0, dest.length - 1))) {
+                    } else if (isDirectory(currentDirTree, _.dropRight(dest))) {
                         effects.push(move(parsedSource, _.dropRight(dest)));
-                        const updatedSource = dest.slice(0, dest.length - 1)
-                            .concat(parsedSource[parsedSource.length - 1])
-                        effects.push(rename(updatedSource, dest.slice(dest.length - 1)));
+                        const updatedSource = dest
+                            .slice(0, dest.length - 1)
+                            .concat(parsedSource[parsedSource.length - 1]);
+                        effects.push(
+                            rename(updatedSource, dest.slice(dest.length - 1))
+                        );
                     }
                 } else if (validSources.length > 0) {
                     // Invalid dest error overrides other errors with more than
                     // 1 source passed in
                     if (!isDirectory(currentDirTree, dest)) {
-                        outputs = [<Error msg={`mv: target '${dirStrings[dirStrings.length - 1]}' is not a directory`} />]
+                        outputs = [
+                            <Error
+                                msg={`mv: target '${
+                                    dirStrings[dirStrings.length - 1]
+                                }' is not a directory`}
+                            />
+                        ];
                     } else {
-                        _.uniqWith(validSources, _.isEqual).forEach((source, i) => {
-                            if (_.isEqual(source, dest)) {
-                                outputs.push(<Error msg={`mv: '${dirStrings[i]}' and '${dirStrings[dirStrings.length - 1]}' are the same file`} />);
+                        _.uniqWith(validSources, _.isEqual).forEach(
+                            (source, i) => {
+                                if (_.isEqual(source, dest)) {
+                                    outputs.push(
+                                        <Error
+                                            msg={`mv: '${dirStrings[i]}' and '${
+                                                dirStrings[
+                                                    dirStrings.length - 1
+                                                ]
+                                            }' are the same file`}
+                                        />
+                                    );
+                                }
+                                effects.push(move(source, dest));
                             }
-                            effects.push(move(source, dest));
-                        })
+                        );
                     }
                 }
             }
@@ -180,90 +302,129 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
         case 'mkdir':
             // Must have a non-flag argument
             if (dirStrings.length < 1) {
-                outputs.push(<Error msg={`mkdir: missing operand`} />);                   
+                outputs.push(<Error msg={`mkdir: missing operand`} />);
             } else {
                 paths.forEach((path, index) => {
-                    const lastElement = path.slice(path.length - 1);
-                    const pathToLastElement = path.slice(0,path.length - 1);
-                    const dirForCommand = goToPath(currentDirTree, pathToLastElement);
-                    if (typeof dirForCommand === 'object') {
+                    const lastElement = _.last(path);
+                    const pathToLastElement = _.dropRight(path);
+                    if (isFileOrDirectory(currentDirTree, path)) {
+                        outputs.push(
+                            <Error
+                                msg={`mkdir: cannot create directory ${
+                                    dirStrings[index]
+                                }: File exists`}
+                            />
+                        );
+                    } else if (isDirectory(currentDirTree, pathToLastElement)) {
                         effects.push(mkdir(pathToLastElement, lastElement));
-                        outputs.push(null);
                     } else {
-                        outputs.push(<Error msg={`mkdir: cannot create directory ${dirStrings[index] || path.join('/')}: No such file or directory`} />);
+                        outputs.push(
+                            <Error
+                                msg={`mkdir: cannot create directory ${
+                                    dirStrings[index]
+                                }: No such file or directory`}
+                            />
+                        );
                     }
                 });
             }
             break;
         case 'rm':
-            // 
+            //
             if (dirStrings.length < 1) {
-                outputs.push(<Error msg={`rm: missing operand`} />);                   
+                outputs.push(<Error msg={`rm: missing operand`} />);
             } else {
                 paths.forEach((path, index) => {
-                    const lastElement = path.slice(path.length - 1);
-                    const pathToLastElement = path.slice(0,path.length - 1);
-                    const dirForCommand = goToPath(currentDirTree, pathToLastElement.concat(lastElement));
-                    switch (typeof dirForCommand){
-                        case 'string':
+                    const lastElement = _.last(path);
+                    const pathToLastElement = _.dropRight(path);
+                    // Remove file if path leads to one
+                    if (isFile(currentDirTree, path)) {
+                        effects.push(rm(pathToLastElement, lastElement));
+                        // Only remove dir if r flag is specified
+                    } else if (isDirectory(currentDirTree, path)) {
+                        if (flags.includes('r')) {
                             effects.push(rm(pathToLastElement, lastElement));
-                            outputs.push(null);
-                            break;
-                        case 'object':
-                            if (flags.includes('r')) {
-                                effects.push(rm(pathToLastElement, lastElement));
-                                outputs.push(null);
-                            }else {
-                                outputs.push(<Error msg={`rm: cannot remove '${dirStrings[index] || path.join('/')}': Is a directory`} />);                                
-                            }
-                            break;
-                        default:
-                            outputs.push(<Error msg={`rm: cannot remove '${dirStrings[index] || path.join('/')}': No such file or directory`} />);
+                        } else {
+                            outputs.push(
+                                <Error
+                                    msg={`rm: cannot remove '${
+                                        dirStrings[index]
+                                    }': Is a directory`}
+                                />
+                            );
+                        }
+                        // Output error if path not valid
+                    } else {
+                        outputs.push(
+                            <Error
+                                msg={`rm: cannot remove '${
+                                    dirStrings[index]
+                                }': No such file or directory`}
+                            />
+                        );
                     }
                 });
             }
             break;
         case 'touch':
             if (dirStrings.length < 1) {
-                outputs.push(<Error msg={`touch: missing operand`} />);                   
+                outputs.push(<Error msg={`touch: missing operand`} />);
             } else {
                 paths.forEach((path, index) => {
-                    const lastElement = path.slice(path.length - 1);
-                    const pathToLastElement = path.slice(0,path.length - 1);
-                    const dirForCommand = goToPath(currentDirTree, pathToLastElement);
-                    if (typeof dirForCommand === 'object') {
+                    const lastElement = _.last(path);
+                    const pathToLastElement = _.dropRight(path);
+                    if (isDirectory(currentDirTree, pathToLastElement)) {
                         effects.push(touch(pathToLastElement, lastElement));
-                        outputs.push(null);
                     } else {
-                        outputs.push(<Error msg={`touch: cannot create file ${dirStrings[index] || path.join('/')}: No such file or directory`} />);
+                        outputs.push(
+                            <Error
+                                msg={`touch: cannot create file ${dirStrings[
+                                    index
+                                ] ||
+                                    path.join('/')}: No such file or directory`}
+                            />
+                        );
                     }
                 });
             }
-            break;   
+            break;
         case 'vim':
             if (dirStrings.length !== 1) {
-                outputs.push(<Error msg={`vim: can only handle exactly 1 file right now`} />);                   
+                outputs.push(
+                    <Error
+                        msg={`vim: can only handle exactly 1 file right now`}
+                    />
+                );
             } else {
-                let pathToFile = pathStringToArray(dirStrings[0]);
-                const fullPath = path.concat(pathToFile);
-                const pathToContainerDir = fullPath.slice(0, fullPath.length - 1);
-                const containerDir = goToPath(currentDirTree, pathToContainerDir);
-                const file = goToPath(currentDirTree, fullPath);
+                const relativePath = pathStringToArray(dirStrings[0]);
+                const fullPath = paths[0];
+                const pathToContainerDir = _.dropRight(fullPath);
                 // PATH TO FILE CANT BE MADE
-                if (containerDir === undefined) {
-                    outputs.push(<Error msg={`vim: can't handle non-existent dirs right now`} />);
-                // PATH LEADS TO A DIR, NOT A FILE
-                } else if (typeof file === 'object') {
-                    outputs.push(<Error msg={`vim: can't handle dirs right now`} />);       
-                } else if (typeof file === 'undefined') {
-                    outputs.push(<Error msg={`vim: can't handle undefined files right now`} />);       
+                if (!isFileOrDirectory(currentDirTree, pathToContainerDir)) {
+                    outputs.push(
+                        <Error
+                            msg={`vim: can't handle non-existent dirs right now`}
+                        />
+                    );
+                } else if (isFile(currentDirTree, fullPath)) {
+                    // Valid Path
+                    effects.push(initializeVim(relativePath));
+                    // PATH LEADS TO A DIR, NOT A FILE
+                } else if (isDirectory(currentDirTree, fullPath)) {
+                    outputs.push(
+                        <Error msg={`vim: can't handle dirs right now`} />
+                    );
+                    // File doesn't exist yet
                 } else {
-                    outputs.push(null);
-                    effects.push(initializeVim(pathToFile));
+                    outputs.push(
+                        <Error
+                            msg={`vim: can't handle undefined files right now`}
+                        />
+                    );
                 }
             }
             break;
-            
+
         default:
             // Check for a path to an executable
             const couldBeDirOrFile = command.includes('/') || command === '~';
@@ -271,17 +432,34 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user){
                 const relativePath = pathStringToArray(command);
                 const fullPath = parsePath(path.concat(relativePath));
                 const fileName = _.last(fullPath);
-                if (isFile(currentDirTree, fullPath) && getFileExtension(fileName) === 'sh')  {
+                if (
+                    isFile(currentDirTree, fullPath) &&
+                    getFileExtension(fileName) === 'sh'
+                ) {
                     effects.push(execute(goToPath(currentDirTree, fullPath)));
                 } else if (isFile(currentDirTree, fullPath)) {
-                    outputs.push(<Error msg={`bash: '${fileName}' is not executable`} />);
+                    outputs.push(
+                        <Error msg={`bash: '${fileName}' is not executable`} />
+                    );
                 } else if (isDirectory(currentDirTree, fullPath)) {
-                    outputs.push(<PlainText text={`bash: ${pathArrayToString(relativePath)}: Is a directory`} />);
+                    outputs.push(
+                        <PlainText
+                            text={`bash: ${pathArrayToString(
+                                relativePath
+                            )}: Is a directory`}
+                        />
+                    );
                 } else {
-                    outputs.push(<Error msg={`bash: ${pathArrayToString(relativePath)}: No such file or directory`} />);
+                    outputs.push(
+                        <Error
+                            msg={`bash: ${pathArrayToString(
+                                relativePath
+                            )}: No such file or directory`}
+                        />
+                    );
                 }
             } else {
-                outputs.push(<Error msg={`${command}: command not found`}/>);
+                outputs.push(<Error msg={`${command}: command not found`} />);
             }
     }
     return {

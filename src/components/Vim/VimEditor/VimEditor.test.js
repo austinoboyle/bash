@@ -4,20 +4,24 @@ import {shallow, mount} from 'enzyme';
 import sinon from 'sinon';
 import thunk from 'redux-thunk';
 import configureMockStore from 'redux-mock-store';
+import AceEditor from 'react-ace';
 
 const mockStore = configureMockStore([thunk]);
 describe('VimEditor', () => {
     let wrapper;
     let props;
     let defineExSpy;
+    let onChangeSpy;
+    let mountedWrapper;
     beforeEach(() => {
         props = {
-            open: jest.fn(),
             write: jest.fn(),
+            quit: jest.fn(),
             filename: 'test.txt',
             initialText: 'test'
         };
         defineExSpy = sinon.spy(Vim, 'defineEx');
+        onChangeSpy = sinon.spy(VimEditor.prototype, 'onChange');
         wrapper = shallow(<VimEditor {...props}/>);
     });
 
@@ -28,6 +32,11 @@ describe('VimEditor', () => {
     it('Calls defineEx more than once', () => {
         expect(defineExSpy.callCount).toBeGreaterThan(1);
     });
+
+    it('calls onChange', () => {
+        wrapper.find(AceEditor).simulate('change');
+        expect(onChangeSpy.callCount).toBe(1);
+    })
 
     it('Handles getValue and setValue editor funcs', () => {
         const editor = {
@@ -48,33 +57,22 @@ describe('VimEditor', () => {
     afterEach(() => {
         wrapper.unmount();
         defineExSpy.restore();
+        onChangeSpy.restore();
     });
 })
 
-describe('Connected VimEditor', () => {
-    let store = mockStore({
-        terminal: {
-            path: ['/'],
-            VimEditor: {
-                pathToFile: ['home', 'test.txt']
-            },
-            dirTree: {
-                '/': {
-                    'home' : {
-                        'test.txt': 'test'
-                    }
-                }
-            }
-        }
-    });
+describe('Mounted VimEditor', () => {
     const props = {
         open: jest.fn(),
-        write: jest.fn(),
+        quit: jest.fn(),
         filename: 'test.txt',
         initialText: 'test'
     };
-    const wrapper = shallow(<ConnectedVimEditor {...props} store={store} />);
+    const wrapper = mount(<VimEditor {...props}/>);
     it('Renders', () => {
         expect(wrapper.length).toBe(1);
+    })
+    it('has vim ref set', () => {
+        expect(wrapper.instance().vim).toBeTruthy();
     })
 })

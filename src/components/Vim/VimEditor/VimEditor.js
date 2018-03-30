@@ -47,7 +47,7 @@ export class VimEditor extends Component {
         this.editor.setValue(value);
     }
 
-    onChange = (newValue) => {
+    onChange(newValue) {
         this.setState({value: newValue})
     }
 
@@ -75,13 +75,12 @@ export class VimEditor extends Component {
     }
 
     render() {
-        console.log("RENDERED");
         const {filename} = {...this.props};
         return <AceEditor
             mode={getLanguageFromFilename(filename)}
             theme="monokai"
             ref={(el) => {this.vim = el;}}
-            onChange={this.onChange}
+            onChange={() => this.onChange()}
             height="auto"
             value={this.state.value}
             width="100%"

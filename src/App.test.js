@@ -32,7 +32,6 @@ describe('App', () => {
 
 describe('Connected App', () => {
     let wrapper;
-    let props;
     beforeEach(() => {
         let store = mockStore({
             terminal: {
