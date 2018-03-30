@@ -372,8 +372,8 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                 outputs.push(<Error msg={`touch: missing operand`} />);
             } else {
                 paths.forEach((path, index) => {
-                    const lastElement = path[path.length - 1];
-                    const pathToLastElement = path.slice(0, path.length - 1);
+                    const lastElement = _.last(path);
+                    const pathToLastElement = _.dropRight(path);
                     if (isDirectory(currentDirTree, pathToLastElement)) {
                         effects.push(touch(pathToLastElement, lastElement));
                     } else {
