@@ -48,7 +48,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
     let paths = [path];
     if (dirStrings.length > 0) {
         paths = dirStrings.map(dirString => {
-            return path.concat(parsePath(pathStringToArray(dirString)));
+            return parsePath(path.concat(pathStringToArray(dirString)));
         });
     }
 
@@ -94,6 +94,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                 effects.push(cd(PROFILE.HOME_DIR_ARR));
             } else {
                 const fullPath = paths[0];
+                console.log('FULLPATH', fullPath);
                 if (isFile(currentDirTree, fullPath)) {
                     outputs.push(
                         <Error
@@ -103,7 +104,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                         />
                     );
                 } else if (isDirectory(currentDirTree, fullPath)) {
-                    effects.push(cd(parsePath(paths[0])));
+                    effects.push(cd(parsePath(fullPath)));
                 } else {
                     outputs.push(
                         <Error
