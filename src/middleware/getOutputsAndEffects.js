@@ -206,10 +206,9 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                     outputs.push(
                         <Error
                             key={i}
-                            msg={`${command}: cannot access '${'/' +
-                                path
-                                    .slice(1)
-                                    .join('/')}': No such file or directory`}
+                            msg={`${command}: cannot access '${
+                                dirStrings[i]
+                            }': No such file or directory`}
                         />
                     );
                 }
@@ -403,10 +402,7 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
             } else {
                 let pathToFile = pathStringToArray(dirStrings[0]);
                 const fullPath = path.concat(pathToFile);
-                const pathToContainerDir = fullPath.slice(
-                    0,
-                    fullPath.length - 1
-                );
+                const pathToContainerDir = _.dropRight(fullPath);
                 const containerDir = goToPath(
                     currentDirTree,
                     pathToContainerDir
@@ -431,7 +427,6 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                         />
                     );
                 } else {
-                    outputs.push(null);
                     effects.push(initializeVim(pathToFile));
                 }
             }
