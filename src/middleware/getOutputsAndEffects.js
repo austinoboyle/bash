@@ -305,8 +305,8 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                 outputs.push(<Error msg={`mkdir: missing operand`} />);
             } else {
                 paths.forEach((path, index) => {
-                    const lastElement = path[path.length - 1];
-                    const pathToLastElement = path.slice(0, path.length - 1);
+                    const lastElement = _.last(path);
+                    const pathToLastElement = _.dropRight(path);
                     if (isFileOrDirectory(currentDirTree, path)) {
                         outputs.push(
                             <Error
@@ -335,44 +335,33 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                 outputs.push(<Error msg={`rm: missing operand`} />);
             } else {
                 paths.forEach((path, index) => {
-                    const lastElement = path.slice(path.length - 1);
-                    const pathToLastElement = path.slice(0, path.length - 1);
-                    const dirForCommand = goToPath(
-                        currentDirTree,
-                        pathToLastElement.concat(lastElement)
-                    );
-                    switch (typeof dirForCommand) {
-                        case 'string':
+                    const lastElement = _.last(path);
+                    const pathToLastElement = _.dropRight(path);
+                    // Remove file if path leads to one
+                    if (isFile(currentDirTree, path)) {
+                        effects.push(rm(pathToLastElement, lastElement));
+                        // Only remove dir if r flag is specified
+                    } else if (isDirectory(currentDirTree, path)) {
+                        if (flags.includes('r')) {
                             effects.push(rm(pathToLastElement, lastElement));
-                            outputs.push(null);
-                            break;
-                        case 'object':
-                            if (flags.includes('r')) {
-                                effects.push(
-                                    rm(pathToLastElement, lastElement)
-                                );
-                                outputs.push(null);
-                            } else {
-                                outputs.push(
-                                    <Error
-                                        msg={`rm: cannot remove '${dirStrings[
-                                            index
-                                        ] || path.join('/')}': Is a directory`}
-                                    />
-                                );
-                            }
-                            break;
-                        default:
+                        } else {
                             outputs.push(
                                 <Error
-                                    msg={`rm: cannot remove '${dirStrings[
-                                        index
-                                    ] ||
-                                        path.join(
-                                            '/'
-                                        )}': No such file or directory`}
+                                    msg={`rm: cannot remove '${
+                                        dirStrings[index]
+                                    }': Is a directory`}
                                 />
                             );
+                        }
+                        // Output error if path not valid
+                    } else {
+                        outputs.push(
+                            <Error
+                                msg={`rm: cannot remove '${
+                                    dirStrings[index]
+                                }': No such file or directory`}
+                            />
+                        );
                     }
                 });
             }
