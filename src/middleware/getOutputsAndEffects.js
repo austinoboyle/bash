@@ -312,10 +312,9 @@ export default function getOutputsAndEffects(text, path, currentDirTree, user) {
                     } else {
                         outputs.push(
                             <Error
-                                msg={`mkdir: cannot create directory ${dirStrings[
-                                    index
-                                ] ||
-                                    path.join('/')}: No such file or directory`}
+                                msg={`mkdir: cannot create directory ${
+                                    dirStrings[index]
+                                }: No such file or directory`}
                             />
                         );
                     }
