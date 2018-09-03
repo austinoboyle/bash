@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {quit, write} from '../../../actions/vimActions';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { quit, write } from '../../../actions/vimActions';
 
-import {getLanguageFromFilename} from '../../../util';
+import { getLanguageFromFilename } from '../../../util';
 
 import brace from 'brace';
 import 'brace/ext/language_tools';
@@ -33,26 +33,26 @@ import 'brace/keybinding/vim';
 export const Vim = brace.acequire('ace/keyboard/vim').CodeMirror.Vim;
 
 export class VimEditor extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            value: this.props.initialText
+            value: props.initialText
         };
     }
     getValue() {
         return this.editor.getValue();
     }
 
-    setValue(value){
+    setValue(value) {
         this.editor.setValue(value);
     }
 
     onChange(newValue) {
-        this.setState({value: newValue})
+        this.setState({ value: newValue });
     }
 
-    componentDidMount(){
-        if (!this.vim){
+    componentDidMount() {
+        if (!this.vim) {
             this.editor = {
                 setValue: () => {},
                 getValue: () => {},
@@ -62,36 +62,50 @@ export class VimEditor extends Component {
         } else {
             this.editor = this.vim.editor;
         }
-        const quit = (cm, input) => {this.props.quit()};
-        const write = (cm, input) => {this.props.write(this.getValue())};
-        Vim.defineEx("write", "w", write);
-        Vim.defineEx("quit", "q", quit);
-        Vim.defineEx("q!", "q!", quit);
-        Vim.defineEx("wq", "wq", () => {write(); quit();})
-        Vim.defineEx("wq!", "wq!",() => {write(); quit();})
+        const quit = (cm, input) => {
+            this.props.quit();
+        };
+        const write = (cm, input) => {
+            this.props.write(this.getValue());
+        };
+        Vim.defineEx('write', 'w', write);
+        Vim.defineEx('quit', 'q', quit);
+        Vim.defineEx('q!', 'q!', quit);
+        Vim.defineEx('wq', 'wq', () => {
+            write();
+            quit();
+        });
+        Vim.defineEx('wq!', 'wq!', () => {
+            write();
+            quit();
+        });
         this.setValue(this.props.initialText);
         this.editor.focus();
-        this.editor.navigateTo(0,0);
+        this.editor.navigateTo(0, 0);
     }
 
     render() {
-        const {filename} = {...this.props};
-        return <AceEditor
-            mode={getLanguageFromFilename(filename)}
-            theme="monokai"
-            ref={(el) => {this.vim = el;}}
-            onChange={() => this.onChange()}
-            height="auto"
-            value={this.state.value}
-            width="100%"
-            name="vim-editor"
-            keyboardHandler="vim"
-            setOptions={{
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true,
-                enableSnippets: true,
-            }}
-        />;
+        const { filename } = { ...this.props };
+        return (
+            <AceEditor
+                mode={getLanguageFromFilename(filename)}
+                theme="monokai"
+                ref={el => {
+                    this.vim = el;
+                }}
+                onChange={val => this.onChange(val)}
+                height="auto"
+                value={this.state.value}
+                width="100%"
+                name="vim-editor"
+                keyboardHandler="vim"
+                setOptions={{
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: true,
+                    enableSnippets: true
+                }}
+            />
+        );
     }
 }
 
@@ -99,12 +113,15 @@ VimEditor.propTypes = exact({
     filename: PropTypes.string.isRequired,
     initialText: PropTypes.string.isRequired,
     write: PropTypes.func.isRequired,
-    quit: PropTypes.func.isRequired,
-})
+    quit: PropTypes.func.isRequired
+});
 
 const actions = {
     quit,
     write
 };
 
-export default connect(null, actions)(VimEditor);
+export default connect(
+    null,
+    actions
+)(VimEditor);
