@@ -1,6 +1,6 @@
 import React from 'react';
 import OutputWrapper from './OutputWrapper';
-import {shallow} from 'enzyme';
+import { shallow } from 'enzyme';
 
 describe('OutputWrapper', () => {
     let wrapper;
@@ -12,7 +12,7 @@ describe('OutputWrapper', () => {
             text: 'Test',
             children: ['Test', 'Test']
         };
-        wrapper = shallow(<OutputWrapper {...props}/>);
+        wrapper = shallow(<OutputWrapper {...props} />);
     });
 
     it('Renders without crashing', () => {
@@ -20,10 +20,12 @@ describe('OutputWrapper', () => {
     });
 
     it('Renders correct number of children', () => {
-        expect(wrapper.find('.output').props().children.length).toBe(props.children.length);
-    })
+        expect(wrapper.find('.outputWrapper>div').props().children.length).toBe(
+            props.children.length
+        );
+    });
 
     afterEach(() => {
         wrapper.unmount();
     });
-})
+});
