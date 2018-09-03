@@ -30,6 +30,18 @@ export class Terminal extends Component {
         }
     }
 
+    scrollToBottom() {
+        setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 0);
+    }
+
+    componentDidMount() {
+        this.scrollToBottom();
+    }
+
+    componentDidUpdate() {
+        this.scrollToBottom();
+    }
+
     handleTimeTravel(e, direction) {
         e.preventDefault();
         let { historyIndex, commandHistory } = { ...this.state };
@@ -167,4 +179,7 @@ const actions = {
     submitCommand
 };
 
-export default connect(mapStateToProps, actions)(Terminal);
+export default connect(
+    mapStateToProps,
+    actions
+)(Terminal);
